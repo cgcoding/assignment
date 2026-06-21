@@ -484,3 +484,83 @@ match both examples (`roll,score` no space; `name, count` with a space).
 > live-network parts (Q1/Q2/Q3/Q4a `wget` downloads) and `g++`/`timeout` behaviour should be
 > re-run on the Linux grading environment to confirm end-to-end, consistent with the
 > report-only scope.
+
+---
+
+## Execution Results (Jun 21, 2026)
+
+> Offline execution on this Linux x86-64 host (`bash`, `g++`, `timeout`, `pdftotext`,
+> `md5sum`, `awk`, `python3` present; `tree` **missing**; network unavailable). Scripts were
+> run unmodified; the only deviations were a `/tmp` scratch copy for Q3 (local file in place
+> of `wget`, not committed) and a synthetic JSON for Q2's downstream stages.
+
+### Q4 (55 marks) - FULLY RUN, reconciles to 114
+
+- **`organise.sh`** - run from `q4/` (no args). Regenerated `organised/` with **11 relative
+  symlinks** (`../../mock_grading/submissions/<file>`). All links resolve (`readlink -e`), all
+  are relative. Multi-file student `220010010` -> two links (`220010010foo.cpp`,
+  `220010010README.txt`); no-`.cpp` student `220010005` -> `220010005notes.txt`. Matches spec.
+- **`evaluate.sh`** - run from `q4/` (no args). Compiles each student `.cpp` from inside
+  `organised/<roll>`, runs all 20 inputs under `timeout 5`, diffs vs `mock_grading/outputs`.
+  Completed in ~61s (the `220010007timeout.cpp` busy-loop on `0.in` is correctly killed at 5s).
+  - `marksheet.csv` is **byte-identical** to the committed file; sum of scores = **114**.
+  - `distribution.txt` counts are identical to committed; sum of counts = **114**. The two
+    tallies reconcile exactly. No script defect.
+  - **Note (not a defect):** `find | sort` makes `distribution.txt` line ordering
+    locale-dependent. The committed/documented order (`0,1,10,...,19,2,...`) is the C-locale
+    order; the ambient locale here (`en_IN`) reorders the `1` line. Counts are unaffected;
+    `distribution.txt` was normalized back to the documented C-locale order
+    (`LC_ALL=C sort -t, -k1,1`) so the committed artifact stays stable. Add `LC_ALL=C` to the
+    `find | sort` if strict reproducibility across locales is desired.
+  - **Environment note (not a script defect):** under the agent sandbox, `timeout` could not
+    deliver the kill signal to the busy-loop child, so the run hung indefinitely; running
+    outside the sandbox, `timeout 5` kills the busy loop at ~5.02s (rc 124) as expected. The
+    grading host has real signal delivery, so `evaluate.sh` is correct as written.
+- **`download.sh`** - static-only (needs network, not run). Logic confirmed vs spec: usage
+  guard, quiet recursive `wget --no-parent`, rejects `index.html*` and `*.tmp`, then locates
+  the target dir and renames to `mock_grading`. The `<cut-dirs>` arg is accepted but ignored
+  (deviation in method, not in result), as previously noted.
+
+### Q1 - `pdfWordCounter.sh` (10 marks) - core pipeline validated offline
+
+- `wget` download out of scope. Ran `pdftotext "Resources/Lecture - Shell Programming Week 2.pdf"
+  - | grep -owi "shell" | wc -l` = **26**.
+- **Case-insensitive** confirmed: `-ow` (case-sensitive) = 17 vs `-owi` = 26.
+- **Whole-word** confirmed: `-owi 'word'` = 0 but `-oi 'word'` = 1 (substring inside a longer
+  token), proving `-w` excludes non-whole-word matches.
+- No temp `.txt` created (the `-` pipes to stdout). Static review of usage guard / single-file
+  `-O` download / `rm -f` cleanup / single `echo` output: all match spec. No bug.
+
+### Q3 - `decipher.sh` (12 marks) - Caesar logic validated offline
+
+- `wget` download out of scope. Built a local `encrypted.txt` (known plaintext containing
+  "Queen"/"Mary" forward-shifted by 7) in a `/tmp` scratch copy with the `wget` line removed
+  (not committed). The script detected **`FOUND_SHIFT=7`**, `deciphered.txt` matched the
+  original plaintext exactly (newlines preserved), and the appended re-encrypted line decrypts
+  back to the exact fixed plaintext - confirming decrypt (`26-s`) and encrypt (`s`) rotations
+  are exact inverses.
+- **Latent edge case (unchanged):** step (d) is unguarded - if no shift were found
+  (`FOUND_SHIFT=-1`), `${LOWER:$FOUND_SHIFT}` parses as `${LOWER:-1}` (default-value operator)
+  and yields the whole alphabet. Benign for valid inputs; guarding (d) with
+  `[ "$FOUND_SHIFT" -ge 0 ]` (as step (c) already is) would harden it.
+
+### Q2 - `downloadContents.sh` (15 marks) - PARTIAL / tree DEFERRED
+
+- Needs network + `tree`; `command -v tree` -> **missing** (system install in progress), so
+  the recursive `wget` (a) and `tree -J` JSON (b) stages are **DEFERRED** (static-review only).
+- Downstream stages validated on a synthetic `urlReport.json`: (c) `md5sum | awk '{print $1}'`
+  prints hash only; (d) `tr -cd '{' | wc -c` = 5; (e) `ps aux | awk 'NR>1 && $2==pid{print $11}'`
+  returned the live process for PID 5 (a bracketed kernel thread, as the notes predict) and
+  `/sbin/init` for PID 1, with the `No such process` fallback when empty. Logic matches spec;
+  caveats (self-inclusion of the report node, `-np` vs page-requisites, bracketed `$11`) stand.
+
+### Status summary
+
+| Question | Run? | Result |
+|---|---|---|
+| Q4 `organise.sh` | Yes (offline) | 11 relative links, all resolve; multi-file & no-`.cpp` correct |
+| Q4 `evaluate.sh` | Yes (offline) | `marksheet.csv` identical; sums reconcile to **114**; no defect |
+| Q4 `download.sh` | Static-only | Matches spec outcome (`cut-dirs` arg ignored) |
+| Q1 `pdfWordCounter.sh` | Pipeline run offline | whole-word + case-insensitive occurrence count confirmed |
+| Q3 `decipher.sh` | Logic run offline | shift 7 found; decrypt/encrypt exact inverses; newlines preserved |
+| Q2 `downloadContents.sh` | Partial | c/d/e validated; `wget`+`tree -J` **DEFERRED** (no `tree`, no network) |

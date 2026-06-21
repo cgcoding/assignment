@@ -1,8 +1,25 @@
 Q1 First-pass triage
 
-1. IPC value from this machine: not available. `perf stat` shows `<not supported>` for both `cycles` and `instructions`, so `insn per cycle` cannot be computed here. The rest of the profile still shows the CPU is spending substantial time stalled in synchronization/scheduling/allocation paths rather than doing useful payload work.
+(Host: x86-64, 8 logical CPUs, glibc/Linux. The `perf` PMU is fully unavailable here:
+`kernel.perf_event_paranoid = 4` and the process lacks CAP_PERFMON / passwordless sudo, so
+`perf_event_open` is denied outright and `perf stat`/`record` error out instead of returning
+counters. The figures below therefore come from getrusage via `/usr/bin/time -v`, not from
+hardware counters; IPC requires the PMU and so remains unmeasurable on this machine.)
 
-2. The `sys` time is disproportionately high for a user-space lock-free queue (example run: user = 26.50s, sys = 8.46s over ~5s wall time). This suggests frequent kernel interaction due to contention-driven yielding (`sched_yield`) and allocator internals under heavy multithreaded pressure.
+1. IPC value from this machine: not available. Computing `insn per cycle` requires the hardware
+`cycles` and `instructions` counters, which the PMU here will not expose (access denied, not
+just `<not supported>`). What can be measured still shows the workload is heavily synchronization-
+and scheduling-bound rather than payload-bound: throughput is only ~2.0 M ops/sec (e.g.
+10,017,831 items consumed in 5.04 s) for 6 producers + 1 consumer on 8 cores, and the run logs
+212,489 involuntary context switches in ~5 s — the signature of constant `sched_yield()` spinning
+under contention, not of useful work being retired.
+
+2. The `sys` time is disproportionately high for a user-space lock-free queue (measured x86-64 run
+via `/usr/bin/time -v`: user = 11.97s, sys = 7.54s, 384% CPU over 5.07s wall). A "lock-free" queue
+that issues no explicit syscalls should spend almost no time in the kernel; 7.54s of sys time means
+frequent hidden kernel entries from contention-driven yielding (`std::this_thread::yield()` ->
+`sched_yield`, visible as `sched_yield@plt` in the producer disassembly) and from glibc allocator
+internals (`operator new`/`delete` per item) under heavy multithreaded pressure.
 
 Q2 Locating the hot functions
 
@@ -12,18 +29,37 @@ Q2 Locating the hot functions
 
 Q3 Diagnosing bottlenecks
 
-On this VM, `perf annotate` did not provide per-instruction percentages for the sampled event. Using `perf report --sort symbol,srcline` for hot lines plus disassembly of `producer_thread`, the hot-path instructions are:
+On this x86-64 host `perf annotate` could not run (PMU access denied, see Q1), so per-instruction
+cycle percentages are not available here. The hot path is instead identified from the optimized
+`producer_thread` disassembly (`objdump -d -C`), where `enqueue()` is fully inlined. The struct
+layout is `head_` @ +0x00, `tail_` @ +0x08, `capacity_` @ +0x10, `storage_` @ +0x18 in `%r14`.
+The critical-path instructions of the enqueue retry loop are:
 
-- `194c: c8dffe61        ldar    x1, [x19]`
-- `1968: c8e0fc65        casal   x0, x5, [x3]`
-- `1974: 54fffec1        b.ne    194c ...`
-- `1984: 9ac10859        udiv    x25, x2, x1`
+- `29eb:  48 8b 36              mov    (%r14),%rsi`            ; load head_ (offset 0x00)
+- `29ff:  f0 48 0f b1 0a        lock cmpxchg %rcx,(%rdx)`      ; CAS publish tail_ (offset 0x08)
+- `2a04:  75 e2                 jne    29e8 <...+0x28>`        ; retry branch after the CAS
+- `2a08:  49 f7 76 10           divq   0x10(%r14)`             ; current_tail % capacity_
 
-1. The load (`ldar x1, [x19]`) reads `head_`, which producer threads do not write. It is expensive because multiple cores repeatedly contend on the same cache line (producer reads while consumer updates), causing coherence traffic (MESI invalidation/ownership transitions) and extra latency.
+These are the x86-64 forms the assignment expects (`mov`/`lock cmpxchg`/`jne`/`divq`); the ARM64
+equivalents are `ldar`/`casal`/`b.ne`/`udiv`. (Also visible nearby: `call sched_yield@plt` on the
+buffer-full path and `lock add %rbx, total_produced`, corroborating the Q1 sys-time story.)
 
-2. The branch after CAS (`b.ne`, analogous to x86 `jne` after `cmpxchg`) is where retries/spin become visible. The atomic CAS initiates the coherence transaction, but the waiting/retry penalty materializes in control flow and pipeline recovery around the branch, so sampled stalls often accumulate on the branch instruction.
+1. The load `mov (%r14),%rsi` reads `head_`, which producer threads never write. It is expensive
+because multiple cores repeatedly contend on the same cache line (producers read `head_` while the
+consumer updates it), causing coherence traffic (MESI invalidation/ownership transitions) and extra
+latency.
 
-3. The division hotspot (`udiv`) comes from modulo indexing in enqueue/dequeue: `index = current_tail % capacity_` (and similarly with `current_head`). A 64-bit integer divide on the critical path is expensive compared with bit-masking or simple arithmetic, so it meaningfully throttles throughput.
+2. The branch after CAS (`jne` after `lock cmpxchg`, analogous to ARM `b.ne` after `casal`) is where
+retries/spin become visible. The atomic CAS initiates the coherence transaction, but the
+waiting/retry penalty materializes in control flow and pipeline recovery around the branch, so
+sampled stalls (sample skid) typically accumulate on the branch rather than the `cmpxchg` itself.
+
+3. The division hotspot (`divq`, ARM `udiv`) comes from modulo indexing in enqueue/dequeue:
+`index = current_tail % capacity_` (and similarly `current_head % capacity_`). A 64-bit integer
+divide on the critical path is expensive compared with bit-masking or simple arithmetic, so it
+meaningfully throttles throughput. (Note `capacity_` is 65536, a power of two, so `& (capacity_-1)`
+would be sufficient — the compiler cannot prove this at compile time because `capacity_` is a
+runtime field, hence the real `divq`.)
 
 Q4 Understanding the atomic memory ordering flaw
 
@@ -69,8 +105,16 @@ Q7 Expected perf-stat movement after fixes
 Why IPC may still look low after fixes:
 In contention-heavy concurrent workloads, throughput can improve even when IPC stays modest, because useful progress depends on synchronization/coherence latency and scheduling dynamics, not only instruction issue width. A low IPC here mainly indicates the cores still spend time waiting (memory/coherence/serialization), not that the algorithm is necessarily slow in terms of completed operations.
 
-Commands run:
-- `make && ./ipc_bench`
-- `perf stat ./ipc_bench`
-- `sudo perf record -- ./ipc_bench`
-- `perf report --stdio -f -i perf.data --sort symbol,srcline`
+Commands run (x86-64 host):
+- `make && ./ipc_bench`                          # baseline: ~2.0 M ops/sec
+- `perf stat ./ipc_bench`                        # BLOCKED: perf_event_paranoid=4, no CAP_PERFMON -> "Access to performance monitoring ... is limited"
+- `perf record -g ./ipc_bench`                   # BLOCKED: same PMU access error
+- `/usr/bin/time -v ./ipc_bench`                 # fallback (getrusage): user 11.97s, sys 7.54s, 212489 involuntary ctx switches, 2607 minor page-faults
+- `objdump -d -C ipc_bench`                      # static disassembly of producer_thread (enqueue inlined) -> x86-64 hot instructions above
+
+Environment limitation: `perf stat`/`record`/`report`/`annotate` cannot run on this VM because the
+PMU is gated by `kernel.perf_event_paranoid = 4` and no elevated capability/sudo is available, so
+IPC and per-instruction cycle percentages are unmeasurable here. The conceptual analysis is
+unaffected, and the hot x86-64 instructions are confirmed by disassembly; on a host with
+`perf_event_paranoid <= 2` (or CAP_PERFMON) re-running `perf stat`/`annotate` would fill in the IPC
+figure and per-line percentages.

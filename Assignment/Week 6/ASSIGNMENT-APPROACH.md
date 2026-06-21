@@ -613,3 +613,79 @@ the given constraints `T >= 1`.)
   [q5/q5.py](q5/q5.py).
 - Re-run Q1->Q2 in order (Q2 consumes Q1's JSON), pipe sample input into Q3/Q4, and run Q5 against
   a throwaway tree to confirm behaviour on **your own machine**.
+
+---
+
+## Execution Results (2026-06-21)
+
+> All five questions were **run for real** offline on this host (`python3` 3.10, Linux). No code
+> defects were found - every solution already matched the spec + Session 6 TA guidance, so **no
+> `qN.py` edits were required**. Summary below; details follow.
+
+| Q | What was run | Result |
+|---|---|---|
+| Q1 | `python3 q1.py` (regenerates both policies) | **PASS** - no fix |
+| Q2 | exhaustive never-lose check + 2 scripted stdin games | **PASS** - no fix |
+| Q3 | sample, edge, and large/timed inputs | **PASS** - no fix |
+| Q4 | transcript sample + tie-break/unreachable cases | **PASS** - no fix |
+| Q5 | built-in demo + throwaway-tree edge cases | **PASS** - no fix |
+
+### Q1 - Wizard's Chess Solver
+
+- Ran `q1.py`; it regenerated `policy_gryffindor.json` (180,361 keys) and `policy_slytherin.json`
+  (114,417 keys). The regenerated files are **byte-identical** to the committed ones (`git diff`
+  empty) - confirming determinism.
+- Verified key format is **concatenated digits, no separator** (e.g. `""` -> `{"0":1.0, ...}`,
+  `"012"` -> `{"3":0.0,"4":1.0,"5":0.0,"6":0.0,"7":0.0,"8":0.0}`): keys like `"012"`/`"048"` exactly
+  as the TA described.
+- Confirmed each value dict ranges over **valid (remaining) moves only** (occupied squares absent)
+  and uses a **deterministic 1.0/0.0 tie-break** (single optimal move = 1.0, rest 0.0) - matching
+  the TA's "pick any one, do not equal-split" rule.
+- Runtime ~65 s (brute-force traversal of the full ~295k-node game tree); acceptable as Q1 has no
+  stated time limit and recursion depth is <= 9.
+
+### Q2 - Marauder's Simulation Engine (the practical Q1 autograder)
+
+- Drove the engine programmatically: an **exhaustive** harness let Gryffindor (bot) play its
+  deterministic policy while Slytherin tried **every** possible response at every turn (101 distinct
+  game lines). Outcome: **99 Gryffindor wins, 2 draws, 0 losses** -> the bot **never loses**,
+  exactly the TA's pass bar for Q1.
+- Also piped two **scripted stdin games** (one move per line, as the CLI expects); both ended
+  `Checkmate! Gryffindor wins.`
+- Confirmed the constructor raises the custom **`PolicyNotFoundError`** when the policy file is
+  missing, and that `bot_move()` falls back to a **random valid move** on an unknown-history
+  `KeyError` (tested with the never-reachable key `"401"`).
+
+### Q3 - Floo Powder Allocator (unbounded coin-change min-coins DP)
+
+- `3 11 / 1 2 5` -> **3**; `2 3 / 2 4` -> **-1** (both expected).
+- Greedy-trap `30 / 1 15 25` -> **2** (DP beats greedy's 6), `0 / 5` -> **0**, `7 / 7` -> **1**.
+- Large/timed: `T=10000, sizes {1,3,7}` -> `1430` in ~0.20 s; impossible `T=9999, sizes {2,4}` ->
+  `-1` in ~0.20 s. Confirms `O(T*K)` and correct `-1` handling.
+
+### Q4 - Parseltongue Log Translator (reverse multi-source BFS)
+
+- Transcript sample (`fichier pas trouve random`) -> **`file not found [ERROR]`** (expected).
+- Lexicographic tie (two English words at equal distance) -> picks the smaller (`ant`).
+- Direct translation + unreachable -> `cat [ERROR]`; an already-English log word -> itself (`file`).
+- Confirms shortest-path translation, lexicographically-smallest tie-break, and literal `[ERROR]`.
+
+### Q5 - Horcrux Sweeper (`os` module)
+
+- Built-in demo printed `diary.destroyed`, `england/ring.destroyed`, `scotland/snake.destroyed`.
+- A throwaway temp tree with edge cases confirmed: exact **`.hx`** only (`.hxl`, `.txt` ignored),
+  exactly **7 bytes** (3-byte, 8-byte, and 0-byte `.hx` files all skipped), rename `.hx ->
+  .destroyed` applied, originals removed, skipped files intact, and the returned list is the
+  **sorted relative paths**.
+
+### Fixes made
+
+- **None.** No defects surfaced at runtime; all five `qN.py` files were left unchanged. (Stray
+  `__pycache__` directories created by the import-based test harnesses were removed; the working
+  tree is clean.)
+
+### Remaining concerns
+
+- Q1's brute-force runtime (~65 s) is fine for grading but could be memoised if a time limit is ever
+  imposed. Q2's CLI reads **one integer per line** from stdin (a space-separated line is rejected as
+  a single token) - worth noting for any autograder that scripts its input.

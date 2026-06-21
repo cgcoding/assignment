@@ -102,8 +102,8 @@ NR == FNR {
     for (i = 1; i <= NF; i++) {
       h = canon($i)
       if (h == "TAG") tag_col = i
-      if (h == "FONT" || h == "TEXT_COLOR" || h == "FG" || h == "FONT_COLOR" || h == "COLOR") fg_col = i
-      if (h == "BACKGROUND" || h == "BG" || h == "BACKGROUND_COLOR") bg_col = i
+      if (h == "FONT" || h == "TEXT_COLOR" || h == "FG" || h == "FONT_COLOR" || h == "COLOR_FONT" || h == "COLOR") fg_col = i
+      if (h == "BACKGROUND" || h == "BG" || h == "BACKGROUND_COLOR" || h == "COLOR_BACKGROUND") bg_col = i
     }
     next
   }
@@ -123,7 +123,7 @@ NR == FNR {
 
 {
   # Preserve separators/header and colorize only course rows.
-  if (NR - FNR <= 3) {
+  if (FNR <= 3) {
     print $0
     next
   }
@@ -133,7 +133,7 @@ NR == FNR {
   bg = bg_code(tag_bg[tag])
 
   if (fg != "" || bg != "") {
-    print fg bg $0 RESET_ALL
+    print bg fg $0 RESET_ALL
   } else {
     print $0
   }

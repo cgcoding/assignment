@@ -445,3 +445,100 @@ here per the report-only constraint.)
 |---|---|---|---|
 | Q1 - Git | [git-history.sh](q1/git-history.sh), [my-log.txt](q1/my-log.txt), [friend-log.txt](q1/friend-log.txt) | **Incorrect / Incomplete** | Hyphenated bash vars + pasted `git log` output make the script non-runnable; the two logs have disjoint hashes (not one shared remote). Workflow logic itself is correct. |
 | Q2 - Docker | [docker-compose.yml](q2/docker-compose.yml), [api/](q2/api), [tester/](q2/tester) | **Appropriate** | All endpoints, health check, `service_healthy` gating, service-name networking, and Dockerfiles meet the spec. |
+
+---
+
+## Execution Results (2026-06-21)
+
+> Corrections applied and verified this run. Q1 was a **static fix only** (no real GitHub
+> repo was created or pushed - the script was not executed, since running it would hit
+> GitHub). Q2 was validated **offline** first and then with a **real Docker Compose run**.
+
+### Q1 - `git-history.sh` fixes (static, syntax-validated)
+
+The script's five-part workflow, exact commit messages (`feat: Login API`, `Adding README`,
+`feat: The Better Idea`, `Fix: Adding Login Prompts`) and branch name (`thisisabetteridea`)
+were all preserved. Three bugs were corrected:
+
+1. **Illegal variable names (blocker).** `GIT-REMOTE-HTTPS` / `GIT-REMOTE-SSH` (hyphens are
+   not valid in shell identifiers) were renamed to `GIT_REMOTE_HTTPS` / `GIT_REMOTE_SSH`, and
+   both `git clone` references were updated from the mis-parsing `"${GIT-REMOTE-SSH}"` (which
+   expands as `${GIT-default}` -> literal `REMOTE-SSH`) to `"$GIT_REMOTE_SSH"`.
+2. **Raw `git log` output pasted into the script body.** The unquoted
+   `commit dd7d5bd... / Author: / Date: / feat: Login API` block (which bash would have tried
+   to execute as commands) was converted into an illustrative `#` comment that also notes the
+   hash is run-dependent.
+3. **Log redirection.** The final two lines used `>>` (append - duplicates on re-run) and
+   wrote `my-log.txt` / `friend-log.txt` into the CWD. They now use `>` and write straight to
+   the `q1/` paths via a `Q1_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"` anchor, so
+   the logs land next to the script as the spec's tree requires.
+
+Validated with `bash -n "Week 5/q1/git-history.sh"` -> **syntax OK**. The script was **not**
+executed (it would contact GitHub, which is out of scope).
+
+**Log consistency caveat (unchanged, by design).** [q1/my-log.txt](q1/my-log.txt) and
+[q1/friend-log.txt](q1/friend-log.txt) still carry **disjoint hash sets**
+(`e898d19/0d835a0/6ea27ea/14d961f` vs `dd7d5bd/3037682/346d7e9/3973397`). Two clones of one
+shared remote must share the hashes of commits that travelled through that remote, so these
+logs can only be made mutually consistent by a **real run of the corrected script against a
+single shared remote** - which is out of scope here. Hashes were **not** fabricated or
+hand-edited to paper over this.
+
+### Q2 - offline endpoint validation (PASS)
+
+`api/server.py` was run directly with `python3` (bound `0.0.0.0:5000`) and each endpoint was
+hit on `127.0.0.1`:
+
+| Endpoint | Expected | Got |
+|---|---|---|
+| `GET /health` | `OK` | `OK` |
+| `GET /square/7` | `49` | `49` |
+| `GET /reverse/docker-compose` | `esopmoc-rekcod` | `esopmoc-rekcod` |
+| `GET /sum?x=13&y=29` | `42` | `42` |
+
+The committed tester was then run against localhost **without modifying it** - it reads an
+optional `BASE_URL` env var (default `http://api:5000`), so `BASE_URL=http://127.0.0.1:5000
+python3 tester/test_api.py` exercised the real tester logic. It printed exactly:
+
+```
+HEALTH=OK
+SQUARE=49
+REVERSE=esopmoc-rekcod
+SUM=42
+ALL_TESTS_PASSED
+```
+
+and exited **0**. The committed `tester/test_api.py` keeps its base URL as the service name
+`http://api:5000` (the localhost target was supplied only via the env override). The server
+process was killed afterward.
+
+### Q2 - real Docker Compose run (PASS)
+
+Docker **was available** this run: `Docker version 29.6.0` and `Docker Compose version
+v5.1.4`. From `Week 5/q2`:
+
+```bash
+docker compose down --volumes --remove-orphans
+docker compose up --build --abort-on-container-exit --exit-code-from tester
+```
+
+Both images built from `python:3.10-slim`; `api` reached the **Healthy** state via its
+Python `urllib` health check; `tester` started only after that and logged the five exact
+lines:
+
+```
+tester-1  | HEALTH=OK
+tester-1  | SQUARE=49
+tester-1  | REVERSE=esopmoc-rekcod
+tester-1  | SUM=42
+tester-1  | ALL_TESTS_PASSED
+```
+
+`tester-1 exited with code 0` and the overall `--exit-code-from tester` result was **0**
+(the `api` container was then stopped with code 137 by the `--abort-on-container-exit`
+teardown, which is expected). The stack was cleaned up with
+`docker compose down --volumes --remove-orphans`.
+
+**Net:** Q1's script is now runnable (syntax-valid) with the workflow intact; Q2 passes both
+the offline validation and a real Compose run with the exact five-line tester output and a
+zero exit code.

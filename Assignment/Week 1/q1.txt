@@ -1,5 +1,17 @@
 Without deleting anything from this file, add your answers at the right places:
 
+[STATUS - regenerated on this x86-64 host, 2026-06-21]
+Q1 bytecode: VERIFIED with CPython 3.10.12 (dis.dis on two_loops_series) - the four ops
+below (LOAD_FAST total1 / LOAD_FAST i / INPLACE_ADD / STORE_FAST total1) match exactly.
+Q2, Q3, Q4: DEFERRED - require pypy3, which is NOT installed on this host (a system
+install was still in progress). The Q3 trace ops and Q4 machine-code answers below are the
+earlier ARM64 samples; they MUST be regenerated under pypy3 on this x86-64 host. The
+ready-to-run instrumented program is saved as q1.py (run: `pypy3 q1.py`,
+`PYPYLOG=jit-log-opt:my_trace.log pypy3 q1.py`, `PYPYLOG=jit-backend:dump.asm pypy3 q1.py`).
+When pypy3 is available: (Q3) replace the pasted bytecode in the trace-sequence answer with
+the actual optimized ops (int_add_ovf / guard_no_overflow / setfield_gc); (Q4) cite the
+loop's conditional branch (e.g. cmp + jge/jl) for the end-of-loop test, not a trap.
+
 
 --------------------------------------------------------------
 

@@ -32,3 +32,4 @@ install(TARGETS helloworld usespthread mygamestatic mygamedynamic
 install(TARGETS MyEngineStatic MyEngineDynamic
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib)
+install(FILES myengine/myengine.hpp DESTINATION include)

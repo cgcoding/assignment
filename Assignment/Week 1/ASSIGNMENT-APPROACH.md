@@ -538,3 +538,80 @@ rows 10-13 from `gdb`), and the key before/after change of `*GOT[printf]`.
   `objdump -d` / `objdump -s -j .got.plt` and `gdb` on *your* build and reconcile every
   cell with its evidence (the Row 1 mismatch shows why each value must be read off the
   excavation, not transcribed).
+
+---
+
+## Execution Results (2026-06-21)
+
+Run on this **x86-64** host. Tools present: `gcc/g++/make/gdb/objdump/readelf/nm/ar/xxd`
+and CPython 3.10.12. **`cmake` and `pypy3` were NOT installed** at execution time (a system
+install was still in progress), so the parts that need them are flagged **DEFERRED** below.
+
+### P1 - JIT (`q1.txt`, `q1.py`)
+- **Q1 bytecode - VERIFIED (no change needed).** Disassembled `two_loops_series` with
+  CPython 3.10.12 (`dis.dis`); `total1 += i` is exactly
+  `LOAD_FAST total1 / LOAD_FAST i / INPLACE_ADD / STORE_FAST total1`, matching the committed
+  answer.
+- **Q2, Q3, Q4 - DEFERRED (needs `pypy3`).** `command -v pypy3` returned nothing. The
+  ready-to-run instrumented program was saved as [q1.py](q1.py) (compile-hook counters for
+  Q2; run under `PYPYLOG=jit-log-opt` / `jit-backend` for Q3/Q4). The Q3/Q4 answers still in
+  `q1.txt` are the earlier **ARM64 samples** and must be regenerated under `pypy3` on this
+  host (Q3: promote `int_add_ovf` / `guard_no_overflow` / `setfield_gc` into the trace
+  answer; Q4: cite the `cmp` + conditional branch, e.g. `jge`/`jl`, for the end-of-loop test
+  instead of a trap). A status note recording this was prepended to `q1.txt`.
+
+### P2 - make / CMake (`q2/`)
+- **`rawmake` - all targets built and ran (one real source fix).** Ran
+  `make -f rawmake <target>` for `helloworld`, `usespthread`, `libMyEngineStatic.a`,
+  `libMyEngineDynamic.so`, `mygamestatic`, `mygamedynamic` (run with `LD_LIBRARY_PATH=.`),
+  and `clean`. `helloworld` prints `Hello, World!`; `mygamestatic`/`mygamedynamic` print a
+  random int; `clean` removes all artifacts.
+  - **Fix applied (source, not `rawmake`):** `usespthread.cpp`'s `print_message_function`
+    returned `void*` but had **no `return` statement**. At `-O2` GCC emitted no `ret`, so the
+    thread fell through into `.fini` and the binary **SIGSEGV'd (exit 139)** with no output
+    (it ran fine at `-O0`). Added `return NULL;`; `usespthread` now prints all three messages
+    and exits 0. `rawmake` itself needed no change (the relative include
+    `"../myengine/myengine.hpp"` in `mygame.cpp` means no `-I` change is required).
+- **Top-level `CMakeLists.txt` - header-install fix applied (regardless of cmake).** Added
+  the missing rule `install(FILES myengine/myengine.hpp DESTINATION include)` after the
+  `install(TARGETS ...)` block, so Task 7.4's header install
+  (`/usr/local/include/myengine.hpp`, or `<prefix>/include`) is now covered alongside the
+  libs.
+- **CMake build + install - DEFERRED (needs `cmake`).** `command -v cmake` returned nothing,
+  so the out-of-source build, the local-prefix install
+  (`cmake -DCMAKE_INSTALL_PREFIX=$PWD/_install ..` then `make install`), and the
+  `mygame/CMakeLists.txt` (Task 8) build could not be exercised. The corrected
+  `CMakeLists.txt` is in place and ready; `mygame/CMakeLists.txt` was reviewed and is
+  consistent (links the installed `MyEngineStatic`/`MyEngineDynamic` from
+  `/usr/local/{include,lib}`).
+
+### P3 - Linking (`q3.txt`) - regenerated with REAL x86-64 values
+Built in a scratch dir with `gcc -g -no-pie -fno-builtin-printf -o hello hello.c`, then
+excavated with `objdump -d`, `objdump -s -j .got.plt`, and `gdb` (before/after the `printf`
+call). The committed ARM64 table (incl. the flagged Row 1 `0x401040` vs `bl 400560`
+inconsistency) was **replaced** with this host's values. Note this toolchain emits the
+modern IBT/CET **split PLT** (the `.plt.sec` entry only does `jmp *GOT[printf]`; the
+`push $index; jmp PLT[0]` lazy half is a separate `.plt` stub).
+
+| # | Value required | New x86-64 value |
+|---|---|---|
+| 1 | `PLT[printf]` | `0x401040` (matches `call 401040 <printf@plt>`) |
+| 2 | `GOT[printf]` | `0x404018` |
+| 3 | `*GOT[printf]` (static) | `0x401030` (into PLT lazy stub) |
+| 4 | `$index` | `0` |
+| 5 | `PLT[0]` | `0x401020` |
+| 6 | `GOT[1]` | `0x404008` |
+| 7 | `*GOT[1]` (static) | `0x0` (filled at load) |
+| 8 | `GOT[2]` | `0x404010` |
+| 9 | `*GOT[2]` (static) | `0x0` (filled at load) |
+| 10 | `*GOT[1]` before call | `0x00007ffff7ffe2e0` (link map) |
+| 11 | `*GOT[2]` before call | `0x00007ffff7fd8c60` (`_dl_runtime_resolve_xsave`) |
+| 12 | `*GOT[printf]` before call | `0x0000000000401030` (unresolved) |
+| 13 | `*GOT[printf]` after call | `0x00007ffff7c606f0` (`printf` in libc.so.6) |
+
+Rows 12->13 capture lazy binding: `*GOT[printf]` flips from the PLT lazy stub to the real
+libc `printf` on first call. (Addresses are stable run-to-run because of `-no-pie`.)
+
+### DEFERRED (tooling not yet installed)
+- **`cmake`** - P2 CMake build/install + Task 8 build (corrected `CMakeLists.txt` is ready).
+- **`pypy3`** - P1 Q2/Q3/Q4 regeneration (`q1.py` is ready; Q1 already verified via CPython).

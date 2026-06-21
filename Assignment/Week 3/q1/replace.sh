@@ -22,9 +22,20 @@ fi
 mkdir -p "$output_dir"
 : > "$patched_list"
 
+# Detect a genuine *call* to init_adapter(), not a bare prototype/declaration.
+# A line such as "int init_adapter(struct adapter_config *cfg);" only declares the
+# function; the brief (and src/README.txt) require a real call site, so the function
+# name must appear at the start of a statement, after `return`/`case`, or after an
+# operator/open-paren -- never preceded by a return-type token in a declaration.
+has_init_adapter_call() {
+  grep -Eq \
+    '(^[[:space:]]*init_adapter[[:space:]]*\()|((return|case)[[:space:]]+[^;]*init_adapter[[:space:]]*\()|([-=(,!?:&|+*/<>%][[:space:]]*init_adapter[[:space:]]*\()' \
+    "$1"
+}
+
 find "$src_root" -type f \( -name "*.c" -o -name "*.h" \) -print0 |
 while IFS= read -r -d '' file; do
-  if grep -q 'init_adapter[[:space:]]*(' "$file" && grep -q '^#include <oldlib\.h>$' "$file"; then
+  if has_init_adapter_call "$file" && grep -q '^#include <oldlib\.h>$' "$file"; then
     sed -i.bak 's|^#include <oldlib.h>$|#include <newlib.h>|' "$file"
 
     if ! cmp -s "$file.bak" "$file"; then

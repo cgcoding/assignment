@@ -378,3 +378,61 @@ be a stricter-than-required alternative.
   `valgrind --leak-check=full ./solved` reports 0 errors.
 - Re-run everything on **your own machine** and record *your* real addresses, opcodes, IPC, and
   percentages; the values quoted above are machine-dependent reference points.
+
+---
+
+## Execution Results (2026-06-21)
+
+Executed on an **x86-64** host (8 logical CPUs). Tooling present: `gcc`/`g++`/`gdb`/`perf`.
+`valgrind` was **not installed** at run time. Scratch builds were done in `/tmp/wk4scratch`;
+no provided source files were modified. Summary: **P1 PASS**, **P2 PASS (perf PMU limited)**,
+**P3 PASS (valgrind DEFERRED, fix proven by runtime crash-vs-clean)**.
+
+### P1 - Stack visualizer (gdb-Python) - PASS
+
+- Built `gcc -g -O0 -fno-omit-frame-pointer -o stack_example stack_example.c`, then drove
+  `gdb -q -batch -x cmds.gdb ./stack_example` with `source .../q1/stack.py`, `break main`, `run`,
+  `break 14` (inside `calc()`), `continue`.
+- Confirmed exactly as specified:
+  - The load banner `"[stack.py] Stack visualizer loaded..."` prints **once** at import.
+  - Each stop prints `rsp = 0x..., rbp = 0x...`.
+  - Boxed 8-byte rows from `rsp` up to and including `rbp+16`, with the right annotations.
+  - `main` frame: `rsp == rbp` (0x7fffffffd5f0) -> **3 rows**, first labelled `<- rsp rbp`.
+  - `calc` frame: `rsp`/`rbp` 0x40 apart -> **11 rows**, `<- rsp` on the first and `<- rbp` on the
+    `rbp` row; the `marker = 0x1122334455667788` is visible little-endian as
+    `88 77 66 55 44 33 22 11`.
+- Byte values are machine-dependent; the **structure** matched the spec. **No defect found;
+  `stack.py` was not edited.**
+
+### P2 - Ring-buffer profiling (perf) - PASS (PMU access limited on this host)
+
+- `make` (`-O3 -g -std=c++17 -pthread -march=native -Wno-interference-size`) + `./ipc_bench`:
+  baseline throughput **~2.0 M ops/sec** (e.g. 10,017,831 items in 5.04 s; 10,754,669 in another run).
+- **perf is fully blocked here:** `kernel.perf_event_paranoid = 4`, no CAP_PERFMON, no passwordless
+  sudo, so `perf stat`/`perf record` error out with *"Access to performance monitoring ... is
+  limited"* (the `perf_event_open` syscall is denied) - **IPC and per-instruction cycle percentages
+  are unmeasurable on this VM.** Recorded honestly in `q2.txt`.
+- **Fallback evidence (getrusage via `/usr/bin/time -v`, no PMU needed):** user **11.97s**,
+  sys **7.54s**, 384% CPU over 5.07s wall, **212,489 involuntary context switches**, 2,607 minor
+  page-faults, max RSS ~12.9 MB. The huge sys time + context-switch count confirm the
+  contention/`sched_yield`/allocator story of Q1-Q2.
+- **Real x86-64 hot instructions** extracted from `objdump -d -C` of the inlined `producer_thread`
+  (replacing the previous ARM64 `ldar`/`casal`/`b.ne`/`udiv` listing in `q2.txt`):
+  `mov (%r14),%rsi` (load `head_` -> MESI contention), `lock cmpxchg %rcx,(%rdx)` (publish `tail_`),
+  `jne` (retry branch after the CAS), `divq 0x10(%r14)` (`current_tail % capacity_`). `q2.txt` Q1/Q3
+  and the commands footer were updated with this host's real numbers and the PMU limitation;
+  the conceptual Q1-Q7 answers were preserved.
+
+### P3 - Memory-leak fix (valgrind) - PASS (valgrind verification DEFERRED)
+
+- Confirmed `solved.cpp` == `problem.cpp` + a **single added line** (line 25,
+  `Tree(const Tree& other) : root(new TreeNode(other.root->data)) {}`), **0 lines removed** -
+  within the "<=5 added, 0 removed" budget.
+- `g++ -g q3/solved.cpp -o solved` builds and runs **cleanly** (exit 0, prints
+  "Check memory usage for leaks!").
+- **valgrind is not installed on this host**, so `valgrind --leak-check=full` could not be run -
+  this verification is **DEFERRED**. However, the fix is demonstrated by runtime behaviour without
+  valgrind: the original `problem.cpp` (implicit shallow-copy double-free) **crashes with SIGSEGV
+  (exit 139)** from heap corruption, while `solved.cpp` exits cleanly - confirming each node is now
+  freed exactly once. On a host with valgrind, re-run to confirm "0 errors from 0 contexts" / all
+  heap freed.

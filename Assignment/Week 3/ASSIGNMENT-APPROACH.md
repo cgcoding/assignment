@@ -445,3 +445,93 @@ not in the solution. Rename to match whatever the grader's harness expects.
    call-detection if the grader treats a declaration as "not a call".
 3. **File naming** - reconcile `viewCourses.sh` vs the brief's `viewCourse.sh`, and confirm
    `calculateCPI.sh` is accepted despite its omission from the brief's submission tree.
+
+---
+
+## Execution Results (2026-06-21)
+
+Everything below was **run** offline with `bash`, `gawk`, `sed`, and `python3` (3.10). Q1
+scripts ran against a freshly restored pristine tree copied from
+[Resources/q1 resources/q1_inputs.tar.gz](Resources/q1%20resources/q1_inputs.tar.gz) /
+[q1 resources/q1_inputs](q1%20resources/q1_inputs) into a scratch dir (the committed
+`q1/q1_inputs` was already mutated by a prior run; the pristine copy was left untouched).
+Outputs were written to a scratch dir and compared with `diff` against the committed
+references.
+
+### Q1 - all five scripts run and diffed
+
+| Subtask | Script | Result |
+|---|---|---|
+| awk-1 | `failed_login.sh q1_inputs/logs/auth.log out` | `failed_logins.txt` **byte-identical** to reference |
+| awk-2 | `summary.sh q1_inputs/logs/auth.log out` | `top_failed_users.txt` **byte-identical** |
+| awk-3 | `local_filter.sh q1_inputs/logs/app.log out` | `error_lines.txt` **byte-identical** |
+| sed-b | `remove_debug.sh q1_inputs out` | `debug_removed_count.txt` = `5` **byte-identical**; no `// TEMPDEBUG:` lines remain |
+| sed-a | `replace.sh q1_inputs out` | see decision below |
+
+**`replace.sh` - prototype-vs-call decision (applied: TIGHTEN).** The brief and
+[src/README.txt](q1/q1_inputs/src/README.txt) both require a genuine **call** to
+`init_adapter()`. The old call-detection regex `init_adapter[[:space:]]*(` also matched the
+pure **prototype** `int init_adapter(struct adapter_config *cfg);` in
+[adapter.h](q1/q1_inputs/src/include/core/adapter.h), which is a *declaration*, not a call.
+I tightened the script to recognise a call only when `init_adapter(` appears at the start of
+a statement, after `return`/`case`, or after an operator/open-paren - never preceded by a
+return-type token in a declaration. Verified against every candidate:
+
+- **Excluded** (now correctly skipped): `adapter.h` (prototype only).
+- **Still patched** (genuine calls, incl. two headers with `return init_adapter(...)`):
+  `adapter_boot.c`, `adapter_reset.h`, `init_sequence.c`, `serial_boot.c`, `recovery.h`,
+  `adapter_probe.c`.
+
+The distractors stayed correct: files with the old include but no call (`connection.c`,
+`serial_diag.c/.h`, `http_client.h`, `legacy_wrap.h`, `init_helpers.h`) are untouched, and
+files that call `init_adapter` without the include (`parser.c`, `recovery.c`) are untouched.
+`.bak` files are cleaned up. Because this is a deliberate behaviour change, the committed
+[q1/q1_outputs/patched_files.txt](q1/q1_outputs/patched_files.txt) was regenerated to the
+corrected **6-file** list (previously 7 including `adapter.h`) so the script and its
+reference stay consistent.
+
+### Q2 - CSV inputs synthesized, all four tasks run
+
+**Input prep (no pip / network / LibreOffice).** A stdlib-only converter
+[Resources/xlsx2csv.py](Resources/xlsx2csv.py) (`zipfile` + `xml.etree.ElementTree`,
+resolving `sharedStrings.xml` and `sheet1.xml`, preserving cell order, integer-valued
+numbers rendered without a trailing `.0`, **CRLF** record terminator) produced
+`allCoursesTaken.csv` (60 data rows), `creditsRequirements.csv`, and
+`letterGradeToNumber.csv` in [q2/resources](q2/resources).
+
+| Task | Command | Result |
+|---|---|---|
+| A | `awk -f viewWithoutColor.awk resources/allCoursesTaken.csv` | **byte-identical** to `outputA` |
+| B | `TERM=xterm ./viewWithColor.sh outputA creditsRequirements.csv` | **byte-identical** to `outputB` |
+| C | `./viewSemester.sh outputB Autumn 2018` | 10 Autumn-2018 rows, sorted by code, colours preserved |
+| D | `./calculateCPI.sh resources/allCoursesTaken.csv resources/letterGradeToNumber.csv` | `9.0460` (verified: 2949 / 326 over all 60 courses) |
+
+**Task B fixes applied (the graded bug + two runtime-discovered defects).**
+
+1. **Colour order (the headline fix):** line ~136 changed from `print fg bg $0 RESET_ALL`
+   to `print bg fg $0 RESET_ALL`. `outputB` emits **background then font** (e.g. `ESC[40m`
+   `ESC[33m` ... `ESC(BESC[m`); with font-first every coloured line failed the plain `diff`.
+2. **Header guard:** `if (NR - FNR <= 3)` changed to `if (FNR <= 3)` so the three header
+   lines of `outputA` pass through uncoloured by record number in the second file rather
+   than relying on an incidental constant.
+3. **Column-name detection (found at runtime):** the spreadsheet's colour columns export as
+   `color_FONT` / `color_BACKGROUND`, but the script's header-alias list only knew
+   `FONT_COLOR` / `BACKGROUND_COLOR` (reversed order), so it never mapped tags to colours.
+   Added `COLOR_FONT` and `COLOR_BACKGROUND` to the alias lists. After this, all tag→colour
+   mappings matched `outputB` exactly (e.g. *Department elective* = black bg + yellow font,
+   *Core course* = cyan bg + black font). Note: colour output requires `tput` to emit
+   xterm-style codes; with `TERM=xterm`/`xterm-256color` the bytes reproduce `outputB`
+   exactly (`setab`/`setaf` are identical across xterm/ansi/linux; the reference `sgr0` is
+   the xterm `ESC(BESC[m` form).
+
+**Naming note (unchanged, documented).** The driver is `viewCourses.sh` (plural) whereas the
+brief's submission tree lists `viewCourse.sh` (singular), and the brief omits
+`calculateCPI.sh` even though Task D requires it. Left as-is - rename only if the grader's
+harness demands the singular form. No file was renamed.
+
+### What was NOT changed
+- The committed `q1/q1_inputs` working tree (already mutated by the prior run) and the
+  pristine `q1 resources/q1_inputs` copy were both left intact.
+- `viewWithoutColor.awk`, `viewSemester.sh`, `calculateCPI.sh`, `failed_login.sh`,
+  `summary.sh`, `local_filter.sh`, `remove_debug.sh`, and `defineColors.sh` needed **no
+  edits** - they already matched the references on real runs.

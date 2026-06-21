@@ -1,11 +1,15 @@
 #!/usr/bin/env bash
 
+# Directory that holds this script (the q1/ folder) — the submission logs are
+# written straight here so they land next to git-history.sh as the spec's tree shows.
+Q1_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 BASE="$HOME/git-assignment"
 ROLLNO=x1chg956
 USERNAME=x1chg956
 USEREMAIL="cgodhandaraman@gmail.com"
-GIT-REMOTE-HTTPS="https://github.com/x1chg956/x1chg956-git.git"
-GIT-REMOTE-SSH="git@github.com:x1chg956/x1chg956-git.git"
+GIT_REMOTE_HTTPS="https://github.com/x1chg956/x1chg956-git.git"
+GIT_REMOTE_SSH="git@github.com:x1chg956/x1chg956-git.git"
 
 mkdir -p "$BASE"
 
@@ -13,7 +17,7 @@ mkdir -p "$BASE"
 # Part 1 — ME ($ROLLNO): first commits on main          (clone, add, commit, push)
 # ============================================================================
 cd "$BASE"
-git clone "${GIT-REMOTE-SSH}" $ROLLNO
+git clone "$GIT_REMOTE_SSH" "$ROLLNO"
 cd "$BASE/$ROLLNO"
 
 
@@ -31,11 +35,13 @@ git commit -m "feat: Login API"
 git log
 git log -1 --format=%H               # the hash to record in README.md
 
-commit dd7d5bd73417b9b0fcb7e81c43fc371b91268bfc (HEAD -> main)
-Author: $ROLLNO <cgodhandaraman@gmail.com>
-Date:   Tue Jun 16 11:57:41 2026 +0530
-
-    feat: Login API
+# Example of what `git log -1` prints here (illustrative only — hashes will
+# differ on every real run, so do NOT rely on this exact value):
+#   commit <40-char-hash> (HEAD -> main)
+#   Author: $ROLLNO <cgodhandaraman@gmail.com>
+#   Date:   <date>
+#
+#       feat: Login API
 
 # Create README.md reporting the hash of the commit above, then commit it.
 git add README.md
@@ -48,7 +54,7 @@ git push -u origin main
 # Part 2 — FRIEND (${ROLLNO}-friend): branch off            (clone, pull, branch)
 # ============================================================================
 cd "$BASE"
-git clone "${GIT-REMOTE-SSH}" ${ROLLNO}-friend
+git clone "$GIT_REMOTE_SSH" "${ROLLNO}-friend"
 cd "$BASE/${ROLLNO}-friend"
 
 # Identify the FRIEND on this clone.
@@ -104,5 +110,5 @@ git push origin main
 # Submission logs
 # ============================================================================
 # Run the same log command from each repo and save the output
-git -C "$BASE/$ROLLNO"        log --oneline --graph --all --decorate >> my-log.txt
-git -C "$BASE/${ROLLNO}-friend" log --oneline --graph --all --decorate >> friend-log.txt
+git -C "$BASE/$ROLLNO"          log --oneline --graph --all --decorate > "$Q1_DIR/my-log.txt"
+git -C "$BASE/${ROLLNO}-friend" log --oneline --graph --all --decorate > "$Q1_DIR/friend-log.txt"

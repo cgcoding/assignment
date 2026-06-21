@@ -1,4 +1,3 @@
-q1_inputs/src/include/core/adapter.h
 q1_inputs/src/legacy/net/adapter_boot.c
 q1_inputs/src/legacy/net/adapter_reset.h
 q1_inputs/src/module1/io/init_sequence.c
