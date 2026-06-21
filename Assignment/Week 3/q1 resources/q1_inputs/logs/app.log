@@ -1,0 +1,6 @@
+2026-07-10 08:11:01 INFO startup module=ingest worker=1 message="service booted"
+2026-07-10 08:11:12 WARN cache module=adapter worker=2 code=W104 message="adapter warmup slow"
+2026-07-10 08:11:21 ERROR cache module=adapter worker=2 code=E203 message="adapter lookup failed"
+2026-07-10 08:11:32 INFO api module=session worker=4 message="request served"
+2026-07-10 08:11:45 ERROR io module=storage worker=5 code=E517 message="short write detected"
+2026-07-10 08:12:01 INFO startup module=housekeeping worker=1 message="heartbeat ok"

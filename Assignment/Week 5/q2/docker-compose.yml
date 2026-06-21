@@ -1,0 +1,23 @@
+services:
+  api:
+    build: ./api
+    healthcheck:
+      # Health check uses the API itself, talking to 127.0.0.1 inside the
+      # api container. The python image has no curl/wget, so we use python.
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request,sys; sys.exit(0) if urllib.request.urlopen('http://127.0.0.1:5000/health', timeout=3).read().decode().strip()=='OK' else sys.exit(1)",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 3s
+
+  tester:
+    build: ./tester
+    depends_on:
+      api:
+        condition: service_healthy

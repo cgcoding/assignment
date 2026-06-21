@@ -1,0 +1,12 @@
+digraph G { 
+splines=line; 
+node5[ label = "5"];
+node3[ label = "3"];
+node1[ label = "1"];
+node4[ label = "4"];
+node9[ label = "9"];
+node5->node3[ label = "L"];
+node5->node9[ label = "R"];
+node3->node1[ label = "L"];
+node3->node4[ label = "R"];
+}
