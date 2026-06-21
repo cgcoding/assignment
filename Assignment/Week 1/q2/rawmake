@@ -1,0 +1,38 @@
+# rawmake
+
+CXX = g++
+CXXFLAGS = -Wall -O2
+LDFLAGS =
+LIBDIR = .
+INCLUDEDIR = .
+
+# 1. helloworld
+helloworld: helloworld.cpp
+	$(CXX) $(CXXFLAGS) -o $@ $<
+
+# 2. usespthread
+usespthread: usespthread.cpp
+	$(CXX) $(CXXFLAGS) -pthread -o $@ $<
+
+# 3. myengine libraries
+myengine.o: myengine/myengine.cpp myengine/myengine.hpp
+	$(CXX) $(CXXFLAGS) -fPIC -c -o $@ myengine/myengine.cpp
+
+libMyEngineStatic.a: myengine.o
+	ar rcs $@ $^
+
+libMyEngineDynamic.so: myengine.o
+	$(CXX) -shared -o $@ $^
+
+# 4. mygamestatic (link with static lib)
+mygamestatic: mygame/mygame.cpp libMyEngineStatic.a
+	$(CXX) $(CXXFLAGS) -o $@ mygame/mygame.cpp -L$(LIBDIR) -lMyEngineStatic -I$(INCLUDEDIR)
+
+# 5. mygamedynamic (link with dynamic lib)
+mygamedynamic: mygame/mygame.cpp libMyEngineDynamic.so
+	$(CXX) $(CXXFLAGS) -o $@ mygame/mygame.cpp -L$(LIBDIR) -lMyEngineDynamic -I$(INCLUDEDIR)
+
+# 6. clean
+.PHONY: clean
+clean:
+	rm -f helloworld usespthread mygamestatic mygamedynamic *.o *.a *.so

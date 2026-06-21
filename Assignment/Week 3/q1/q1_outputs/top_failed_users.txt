@@ -1,0 +1,10 @@
+root 5
+deploy 4
+admin 3
+backup 2
+git 2
+guest 2
+monitor 2
+demo 1
+ftp 1
+nagios 1

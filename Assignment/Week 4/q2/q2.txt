@@ -1,0 +1,76 @@
+Q1 First-pass triage
+
+1. IPC value from this machine: not available. `perf stat` shows `<not supported>` for both `cycles` and `instructions`, so `insn per cycle` cannot be computed here. The rest of the profile still shows the CPU is spending substantial time stalled in synchronization/scheduling/allocation paths rather than doing useful payload work.
+
+2. The `sys` time is disproportionately high for a user-space lock-free queue (example run: user = 26.50s, sys = 8.46s over ~5s wall time). This suggests frequent kernel interaction due to contention-driven yielding (`sched_yield`) and allocator internals under heavy multithreaded pressure.
+
+Q2 Locating the hot functions
+
+1. Top symbols from `perf report` include kernel scheduler addresses, `__sched_yield`, and `producer_thread(...)`; allocator paths (`_int_malloc`, `_int_free_chunk`, `malloc`, `cfree`) are also significant. This indicates the implementation is spending many cycles in scheduling and heap management overhead, not just queue logic.
+
+2. With `-O3`, enqueue/dequeue logic is inlined into caller code (for this binary, `producer_thread` carries the hotspots). So function-level `perf report` is not enough by itself; you need instruction/source-level inspection (`perf annotate`, or disassembly + source mapping) to identify the exact bottleneck instructions and lines.
+
+Q3 Diagnosing bottlenecks
+
+On this VM, `perf annotate` did not provide per-instruction percentages for the sampled event. Using `perf report --sort symbol,srcline` for hot lines plus disassembly of `producer_thread`, the hot-path instructions are:
+
+- `194c: c8dffe61        ldar    x1, [x19]`
+- `1968: c8e0fc65        casal   x0, x5, [x3]`
+- `1974: 54fffec1        b.ne    194c ...`
+- `1984: 9ac10859        udiv    x25, x2, x1`
+
+1. The load (`ldar x1, [x19]`) reads `head_`, which producer threads do not write. It is expensive because multiple cores repeatedly contend on the same cache line (producer reads while consumer updates), causing coherence traffic (MESI invalidation/ownership transitions) and extra latency.
+
+2. The branch after CAS (`b.ne`, analogous to x86 `jne` after `cmpxchg`) is where retries/spin become visible. The atomic CAS initiates the coherence transaction, but the waiting/retry penalty materializes in control flow and pipeline recovery around the branch, so sampled stalls often accumulate on the branch instruction.
+
+3. The division hotspot (`udiv`) comes from modulo indexing in enqueue/dequeue: `index = current_tail % capacity_` (and similarly with `current_head`). A 64-bit integer divide on the critical path is expensive compared with bit-masking or simple arithmetic, so it meaningfully throttles throughput.
+
+Q4 Understanding the atomic memory ordering flaw
+
+1. Default `seq_cst` on each atomic load/store/CAS enforces a single global order across threads. At hardware level this can force stronger fences/ordering constraints, reduce store-buffer freedom, and limit overlap/reordering, increasing pipeline stalls under contention.
+
+2. Acquire-release is sufficient here:
+- Acquire load: prevents later reads/writes from moving before the load; consumer that acquires an index sees data written before the matching release.
+- Release store: prevents earlier writes from moving after the store; producer publishes fully initialized data before making it visible.
+This pairing is enough so the consumer never observes a claimed slot before its payload is fully written.
+
+Q5 Heap allocation and kernel overhead
+
+1. `virtual ~LogEntry()` adds a hidden vptr (pointer-sized metadata) to every object. This increases object footprint and reduces effective cache density; sequential consumer scans touch more cache lines and suffer worse locality.
+
+2. `new LogEntry()`/`delete` on the hot path route through glibc allocator internals, which under high thread contention use arena synchronization and can spin/block. That effectively serializes threads at allocator boundaries, which explains both allocator hotspots and elevated `sys` time despite an otherwise lock-free queue algorithm.
+
+Q6 Proposing and justifying fixes
+
+1. Atomic index layout flaw:
+- Flaw: `head_` and `tail_` are adjacent and induce false sharing/coherence ping-pong.
+- Fix: place them on separate cache lines (padding or `alignas(64)` wrappers).
+
+2. Memory-ordering flaw:
+- Flaw: all atomics default to `seq_cst`, stronger than necessary.
+- Fix: use acquire/release (and relaxed where safe) for queue publication/consumption semantics.
+
+3. Allocation/object-layout flaw:
+- Flaw: per-item dynamic allocation plus virtual destructor in hot path creates allocator and cache overhead.
+- Fix: store `LogEntry` inline in a preallocated ring and remove virtual dispatch metadata.
+
+Q7 Expected perf-stat movement after fixes
+
+1. page-faults: down (or roughly same low level). Fewer allocator calls reduce page churn/allocator metadata pressure.
+
+2. instructions: down. Removing malloc/free traffic and retry-heavy slow path reduces total retired instructions for the same work.
+
+3. IPC: up modestly (though may still remain low). Fewer stalls/fences/contention events improve instruction issue efficiency.
+
+4. sys time: down significantly. Less yielding and less allocator/internal kernel interaction.
+
+5. Throughput (M ops/sec): up significantly. The hot path becomes shorter and less contended.
+
+Why IPC may still look low after fixes:
+In contention-heavy concurrent workloads, throughput can improve even when IPC stays modest, because useful progress depends on synchronization/coherence latency and scheduling dynamics, not only instruction issue width. A low IPC here mainly indicates the cores still spend time waiting (memory/coherence/serialization), not that the algorithm is necessarily slow in terms of completed operations.
+
+Commands run:
+- `make && ./ipc_bench`
+- `perf stat ./ipc_bench`
+- `sudo perf record -- ./ipc_bench`
+- `perf report --stdio -f -i perf.data --sort symbol,srcline`

@@ -1,0 +1,69 @@
+Without deleting anything from this file, add your answers at the right places:
+
+
+--------------------------------------------------------------
+
+1. What is the bytecode sequence for total1 += i? Cut and paste what you think to be the bytecode sequence for total1 += i:
+
+16 LOAD_FAST                1 (total1)
+18 LOAD_FAST                2 (i)
+20 INPLACE_ADD
+22 STORE_FAST               1 (total1)
+
+--------------------------------------------------------------
+
+2. At which iteration numbers are Loop 2 and Loop 3 detected to be hotspots?
+
+
+Answer Loop 2 = 81 Loop 3 = 81
+
+
+Cut and paste output of your instrumented program in support of your answer (Max 4 lines):
+
+JIT compiled loop: type= loop no= unknown
+loop2_counter = 81 loop3_counter = 0
+JIT compiled loop: type= loop no= unknown
+loop2_counter = 300 loop3_counter = 81
+
+--------------------------------------------------------------
+
+3. What is the optimized interpreter trace sequence for total1 += i inside the first loop. Cut and paste from my_trace.log what you think to be the sequence for total1 += i:
+LOAD_FAST total1
+LOAD_FAST i
+BINARY_ADD
+STORE_FAST total1
+
+Mention how the updated value of i and total1 are carried forward to the next iteration (Max 2 lines)
+The updated `total1` and incremented `i` are passed as live variables on the loop backedge.
+They become the input state for the next iteration through the final `jump(...)`.
+
+Evidence from my_trace.log in support of your answer (Max 4 lines):
+debug_merge_point(0, 0, 'two_loops_series;/Users/chandra/Library/Mobile Documents/com~apple~CloudDocs/ePGD/The Program Developers Toolbox/Week 1/Assignment/q1.py:14-19~#28 INPLACE_ADD')
++616: setfield_gc(ConstPtr(ptr59), i58, descr=<FieldS pypy.objspace.std.typeobject.IntMutableCell.inst_intvalue 8>)
++620: i60 = int_add_ovf(i47, i52)
+guard_no_overflow(descr=<Guard0x732e4eb18>) [p0, p6, p9, p15, p17, p19, p21, p23, p25, p31, p1, i47, i52, None, None, None]
+
+---------------------------------------------------------------------
+
+4. In the assembly for the hotspots, identify the instruction(s) corresponding to:
+
+
+a. the end-of-loop test:
+168: eb06009f     	cmp	x4, x6
+16c: d4200000     	brk	#0
+
+
+b. the code for total1 += i,
+18c: ab040065     	adds	x5, x3, x4
+
+
+c. any overflow checks,
+18c: ab040065     	adds	x5, x3, x4
+190: d4200000     	brk	#0
+
+
+d. and the backedge jump.
+1b8: 17ffffe6     	b	0x150 <ltmp0+0x150>
+
+
+---------------------------------------------------------------------
