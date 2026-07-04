@@ -1,0 +1,41 @@
+echo "Original"
+g++ -O0  -o search_1 search_1.cpp
+hyperfine --warmup 3 search_1
+echo "---------------"
+echo ""
+
+echo "Vector access replaced by pointers in quicksort"
+g++ -O0  -o search_2 search_2.cpp
+hyperfine --warmup 3  search_2
+echo "---------------"
+echo ""
+
+echo "2 partitions to a call"
+g++ -O0  -o search_3 search_3.cpp
+hyperfine --warmup 3  search_3
+echo "---------------"
+echo ""
+
+echo "swap inlining"
+g++ -O0  -o search_4 search_4.cpp
+hyperfine --warmup 3  search_4
+echo "---------------"
+echo ""
+
+echo "Vector access replaced by pointers in binary_search"
+g++ -O0  -o search_5 search_5.cpp
+hyperfine --warmup 3  search_5
+echo "---------------"
+echo ""
+
+echo "O2 optimization"
+g++ -O2  -o search_1 search_1.cpp
+hyperfine --warmup 3  search_1
+echo "---------------"
+echo ""
+
+#echo "with warmup and prepare"
+#hyperfine \
+#  --warmup 3 \
+#   'echo 3 | sudo tee /proc/sys/vm/drop_caches' \
+#  './search_1' './search_2' './search_3' './search_4' './search_5'

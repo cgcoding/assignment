@@ -1,0 +1,125 @@
+Q1 First-pass triage
+
+(Host: x86-64, 8 logical CPUs, glibc/Linux, perf 6.8.12 with user-space PMU counters
+(`cycles:u`/`instructions:u`) available; measured 2026-07-04.)
+
+1. IPC value from this machine: 0.13 insn per cycle. From `perf stat ./ipc_bench`:
+42,397,378,897 cycles:u and 5,662,682,909 instructions:u over a 5.01 s run
+(6.649 CPUs utilized, throughput 3.31 M ops/sec, 16,575,191 items consumed).
+An IPC of 0.13 on a core that can retire ~4 instructions/cycle means the pipelines are
+stalled ~97% of the time: the workload is synchronization- and coherence-bound (atomic
+contention, cache-line ping-pong, yield-induced scheduling), not payload-bound.
+
+2. The `sys` time is disproportionately high for a user-space lock-free queue (measured
+run: user = 18.18s, sys = 15.17s over 5.01s wall). A "lock-free" queue that issues no
+explicit syscalls should spend almost no time in the kernel; ~15s of sys time means
+frequent hidden kernel entries from contention-driven yielding (`std::this_thread::yield()`
+-> `sched_yield`, 10.11% of samples land in libc `__sched_yield` plus ~7% in the kernel
+entry path) and from glibc allocator internals (`operator new`/`delete` per item) under
+heavy multithreaded pressure.
+
+Q2 Locating the hot functions
+
+1. Top symbols from `perf report --no-children` (135K cycle samples): `producer_thread`
+47.12%, `consumer_thread` 22.34%, libc `__sched_yield` 10.11%, kernel entry addresses ~7%,
+and the allocator paths `_int_malloc` 6.12% / `_int_free` 4.14% / `malloc` 1.46%. So beyond
+the queue logic itself, a third of all cycles go to scheduling (yield) and heap management
+overhead.
+
+2. With `-O3`, enqueue/dequeue logic is inlined into caller code (for this binary, `producer_thread` carries the hotspots). So function-level `perf report` is not enough by itself; you need instruction/source-level inspection (`perf annotate`, or disassembly + source mapping) to identify the exact bottleneck instructions and lines.
+
+Q3 Diagnosing bottlenecks
+
+`perf annotate --stdio --symbol='producer_thread(...)'` on this x86-64 host (74,410 cycle
+samples in the symbol; `enqueue()` is fully inlined into `producer_thread` at -O3). The
+struct layout is `head_` @ +0x00 (`0x0(%r13)`), `tail_` @ +0x08 (`(%rbx)`), `capacity_`
+@ +0x10. The critical-path instructions of the enqueue retry loop, with their measured
+per-instruction cycle percentages:
+
+-   15.13% : 2970:  mov    (%rbx),%rax          ; tail_.load()
+-   15.16% : 2976:  mov    0x0(%r13),%rsi       ; head_.load()  (coherence ping-pong)
+-   41.07% : 298b:  lock cmpxchg %rdx,(%rbx)    ; CAS publish tail_
+-    0.46% : 2990:  jne    2973 <...+0x33>      ; retry branch after the CAS
+-    9.76% : 299c:  divq   0x10(%r13)           ; current_tail % capacity_
+-    1.52% : 2a18:  call   sched_yield@plt      ; buffer-full path
+
+These are the x86-64 forms the assignment expects (`mov`/`lock cmpxchg`/`jne`/`divq`); the
+ARM64 equivalents are `ldar`/`casal`/`b.ne`/`udiv`.
+
+1. The loads of `head_` and `tail_` (15.16% + 15.13%) are plain movs that would normally be
+nearly free; they are expensive because multiple cores repeatedly contend on the same cache
+line (producers read `head_` while the consumer updates it, and everyone hammers `tail_`),
+causing coherence traffic (MESI invalidation/ownership transitions) and extra latency.
+
+2. The `lock cmpxchg` itself carries 41.07% of samples and the following `jne` retry branch
+is where remaining retry/spin cost becomes visible. The atomic CAS initiates the coherence
+transaction (exclusive ownership of the line), and the waiting/retry penalty materializes
+in the CAS and in control flow/pipeline recovery around the branch (sample skid can shift
+stalls between the two).
+
+3. The division hotspot (`divq`, ARM `udiv`) comes from modulo indexing in enqueue/dequeue:
+`index = current_tail % capacity_` (and similarly `current_head % capacity_`). A 64-bit integer
+divide on the critical path is expensive compared with bit-masking or simple arithmetic, so it
+meaningfully throttles throughput. (Note `capacity_` is 65536, a power of two, so `& (capacity_-1)`
+would be sufficient — the compiler cannot prove this at compile time because `capacity_` is a
+runtime field, hence the real `divq`.)
+
+Q4 Understanding the atomic memory ordering flaw
+
+1. Default `seq_cst` on each atomic load/store/CAS enforces a single global order across threads. At hardware level this can force stronger fences/ordering constraints, reduce store-buffer freedom, and limit overlap/reordering, increasing pipeline stalls under contention.
+
+2. Acquire-release is sufficient here:
+- Acquire load: prevents later reads/writes from moving before the load; consumer that acquires an index sees data written before the matching release.
+- Release store: prevents earlier writes from moving after the store; producer publishes fully initialized data before making it visible.
+This pairing is enough so the consumer never observes a claimed slot before its payload is fully written.
+
+Q5 Heap allocation and kernel overhead
+
+1. `virtual ~LogEntry()` adds a hidden vptr (pointer-sized metadata) to every object. This increases object footprint and reduces effective cache density; sequential consumer scans touch more cache lines and suffer worse locality.
+
+2. `new LogEntry()`/`delete` on the hot path route through glibc allocator internals, which under high thread contention use arena synchronization and can spin/block. That effectively serializes threads at allocator boundaries, which explains both allocator hotspots and elevated `sys` time despite an otherwise lock-free queue algorithm.
+
+Q6 Proposing and justifying fixes
+
+1. Atomic index layout flaw:
+- Flaw: `head_` and `tail_` are adjacent and induce false sharing/coherence ping-pong.
+- Fix: place them on separate cache lines (padding or `alignas(64)` wrappers).
+
+2. Memory-ordering flaw:
+- Flaw: all atomics default to `seq_cst`, stronger than necessary.
+- Fix: use acquire/release (and relaxed where safe) for queue publication/consumption semantics.
+
+3. Allocation/object-layout flaw:
+- Flaw: per-item dynamic allocation plus virtual destructor in hot path creates allocator and cache overhead.
+- Fix: store `LogEntry` inline in a preallocated ring and remove virtual dispatch metadata.
+
+Q7 Expected perf-stat movement after fixes
+
+1. page-faults: down (or roughly same low level). Fewer allocator calls reduce page churn/allocator metadata pressure.
+
+2. instructions: down. Removing malloc/free traffic and retry-heavy slow path reduces total retired instructions for the same work.
+
+3. IPC: up modestly (though may still remain low). Fewer stalls/fences/contention events improve instruction issue efficiency.
+
+4. sys time: down significantly. Less yielding and less allocator/internal kernel interaction.
+
+5. Throughput (M ops/sec): up significantly. The hot path becomes shorter and less contended.
+
+Why IPC may still look low after fixes:
+In contention-heavy concurrent workloads, throughput can improve even when IPC stays modest, because useful progress depends on synchronization/coherence latency and scheduling dynamics, not only instruction issue width. A low IPC here mainly indicates the cores still spend time waiting (memory/coherence/serialization), not that the algorithm is necessarily slow in terms of completed operations.
+
+Commands run (x86-64 host, 2026-07-04, perf 6.8.12, perf_event_paranoid=2 so user-space
+counters are available):
+- `make && ./ipc_bench`                          # baseline: 3.31 M ops/sec (16,575,191 items / 5.01 s)
+- `perf stat -e task-clock,context-switches,cpu-migrations,page-faults,cycles,instructions,branches,branch-misses ./ipc_bench`
+      # 42,397,378,897 cycles:u; 5,662,682,909 instructions:u -> IPC = 0.13
+      # 2751 page-faults:u; 1,304,229,464 branches:u; 3.15% branch-misses
+      # user 18.18s / sys 15.17s over 5.01s wall (6.649 CPUs utilized)
+- `perf record -g -o perf.data ./ipc_bench`      # 135K cycle samples
+- `perf report --stdio --no-children`            # producer 47.12%, consumer 22.34%, __sched_yield 10.11%, _int_malloc 6.12%, _int_free 4.14%, malloc 1.46%
+- `perf annotate --stdio --symbol='producer_thread(...)'`
+      # lock cmpxchg 41.07%, head_/tail_ loads 15.16%/15.13%, divq 9.76%, jne 0.46%
+
+(Kernel-side counters (`context-switches`, kernel samples) read 0/unresolved because
+paranoid=2 restricts profiling to user space; all figures above are `:u` scoped, which is
+sufficient for IPC and the per-instruction annotate percentages.)

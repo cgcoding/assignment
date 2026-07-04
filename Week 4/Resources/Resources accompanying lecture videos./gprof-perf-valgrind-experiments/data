@@ -1,0 +1,544 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 372  of event 'cycles:P'
+# Event count (approx.): 72833276
+#
+# Overhead       Samples  Command   Shared Object         Symbol                                                                                                                                                                                
+# ........  ............  ........  ....................  ......................................................................................................................................................................................
+#
+    42.55%           167  search_1  search_1              [.] quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          
+            |--36.32%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |          
+            |          |--35.49%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |          |          
+            |          |           --35.07%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |          
+            |          |                     |--33.26%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |          |          
+            |          |                     |           --33.07%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |                     |          
+            |          |                     |                     |--31.46%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |                     |          |          
+            |          |                     |                     |          |--29.25%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |                     |          |          |          
+            |          |                     |                     |          |          |--27.92%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |                     |          |          |          |          
+            |          |                     |                     |          |          |          |--26.94%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |                     |          |          |          |          |          
+            |          |                     |                     |          |          |          |          |--25.37%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |                     |          |          |          |          |          |          
+            |          |                     |                     |          |          |          |          |          |--24.01%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |                     |          |          |          |          |          |          |          
+            |          |                     |                     |          |          |          |          |          |          |--21.84%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |                     |          |          |          |          |          |          |          |          
+            |          |                     |                     |          |          |          |          |          |          |          |--20.03%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |                     |          |          |          |          |          |          |          |          |          
+            |          |                     |                     |          |          |          |          |          |          |          |          |--18.26%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |--17.69%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |--16.24%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |--14.80%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |--11.17%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |          
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |--9.63%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |          |--7.91%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |--6.33%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |--5.23%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |--3.92%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |--3.41%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |--1.82%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |           --1.62%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |                     |          
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |                      --1.21%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |                                |          
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |                                 --0.83%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |                                           quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |                                           quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |           --1.59%--main
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |                     __libc_start_call_main
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |           --0.51%--main
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |                     __libc_start_call_main
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |           --1.31%--main
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |                     __libc_start_call_main
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |           --1.10%--main
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |                     __libc_start_call_main
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |          |           --1.58%--main
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |          |                     __libc_start_call_main
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |           --1.73%--main
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |                     __libc_start_call_main
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |          
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |           --1.54%--main
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |                     __libc_start_call_main
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          |          
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |           --3.63%--main
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |                     __libc_start_call_main
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          |          
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |           --1.44%--main
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |                     __libc_start_call_main
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          |          
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |           --1.45%--main
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |                     __libc_start_call_main
+            |          |                     |                     |          |          |          |          |          |          |          |          |          |          
+            |          |                     |                     |          |          |          |          |          |          |          |          |           --0.58%--main
+            |          |                     |                     |          |          |          |          |          |          |          |          |                     __libc_start_call_main
+            |          |                     |                     |          |          |          |          |          |          |          |          |          
+            |          |                     |                     |          |          |          |          |          |          |          |           --1.76%--main
+            |          |                     |                     |          |          |          |          |          |          |          |                     __libc_start_call_main
+            |          |                     |                     |          |          |          |          |          |          |          |          
+            |          |                     |                     |          |          |          |          |          |          |           --1.82%--main
+            |          |                     |                     |          |          |          |          |          |          |                     __libc_start_call_main
+            |          |                     |                     |          |          |          |          |          |          |          
+            |          |                     |                     |          |          |          |          |          |           --2.17%--main
+            |          |                     |                     |          |          |          |          |          |                     __libc_start_call_main
+            |          |                     |                     |          |          |          |          |          |          
+            |          |                     |                     |          |          |          |          |           --1.35%--main
+            |          |                     |                     |          |          |          |          |                     __libc_start_call_main
+            |          |                     |                     |          |          |          |          |          
+            |          |                     |                     |          |          |          |           --1.58%--main
+            |          |                     |                     |          |          |          |                     __libc_start_call_main
+            |          |                     |                     |          |          |          |          
+            |          |                     |                     |          |          |           --0.97%--main
+            |          |                     |                     |          |          |                     __libc_start_call_main
+            |          |                     |                     |          |          |          
+            |          |                     |                     |          |           --1.34%--main
+            |          |                     |                     |          |                     __libc_start_call_main
+            |          |                     |                     |          |          
+            |          |                     |                     |           --2.21%--main
+            |          |                     |                     |                     __libc_start_call_main
+            |          |                     |                     |          
+            |          |                     |                      --1.61%--main
+            |          |                     |                                __libc_start_call_main
+            |          |                     |          
+            |          |                      --1.81%--main
+            |          |                                __libc_start_call_main
+            |          |          
+            |           --0.83%--main
+            |                     __libc_start_call_main
+            |          
+             --5.91%--std::vector<int, std::allocator<int> >::operator[](unsigned long)
+                       quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                       |          
+                       |--4.89%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                       |          quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                       |          |          
+                       |           --4.71%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                       |                     quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                       |                     quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                       |                     |          
+                       |                     |--3.93%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                       |                     |          |          
+                       |                     |          |--3.13%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                       |                     |          |          quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                       |                     |          |          |          
+                       |                     |          |           --2.94%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                       |                     |          |                     quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                       |                     |          |                     |          
+                       |                     |          |                     |--2.34%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                       |                     |          |                     |          |          
+                       |                     |          |                     |           --2.15%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                       |                     |          |                     |                     |          
+                       |                     |          |                     |                      --1.73%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                       |                     |          |                     |                                |          
+                       |                     |          |                     |                                 --1.37%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                       |                     |          |                     |                                           quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                       |                     |          |                     |                                           |          
+                       |                     |          |                     |                                           |--0.76%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                       |                     |          |                     |                                           |          |          
+                       |                     |          |                     |                                           |           --0.58%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                       |                     |          |                     |                                           |                     quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                       |                     |          |                     |                                           |          
+                       |                     |          |                     |                                            --0.61%--main
+                       |                     |          |                     |                                                      __libc_start_call_main
+                       |                     |          |                     |          
+                       |                     |          |                      --0.60%--main
+                       |                     |          |                                __libc_start_call_main
+                       |                     |          |          
+                       |                     |           --0.80%--main
+                       |                     |                     __libc_start_call_main
+                       |                     |          
+                       |                      --0.78%--main
+                       |                                __libc_start_call_main
+                       |          
+                        --1.02%--main
+                                  __libc_start_call_main
+
+    34.49%           124  search_1  search_1              [.] std::vector<int, std::allocator<int> >::operator[](unsigned long)
+            |          
+            |--28.51%--std::vector<int, std::allocator<int> >::operator[](unsigned long)
+            |          |          
+            |          |--26.91%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |          |          
+            |          |           --26.49%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |          
+            |          |                     |--25.89%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |          |          
+            |          |                     |          |--24.03%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |          |          |          
+            |          |                     |          |          |--22.40%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |          |          |          |          
+            |          |                     |          |          |          |--21.00%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |          |          |          |          |          
+            |          |                     |          |          |          |           --20.81%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |          |          |          |                     |          
+            |          |                     |          |          |          |                     |--20.01%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |          |          |          |                     |          |          
+            |          |                     |          |          |          |                     |          |--18.85%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |          |          |          |                     |          |          |          
+            |          |                     |          |          |          |                     |          |          |--17.20%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |          |          |          |                     |          |          |          |          
+            |          |                     |          |          |          |                     |          |          |          |--16.20%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |          |          |          |                     |          |          |          |          |          
+            |          |                     |          |          |          |                     |          |          |          |          |--15.01%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |          |          |          |                     |          |          |          |          |          |          
+            |          |                     |          |          |          |                     |          |          |          |          |          |--13.32%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |--11.95%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |--9.66%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |--8.61%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |--7.84%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |          
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |--6.89%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |          |          
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |          |--6.14%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |          |          |          
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |          |          |--5.40%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |          
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |--4.46%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |          |          
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |           --4.29%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |                     |          
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |                     |--2.86%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |                     |          |          
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |                     |          |--2.28%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |                     |          |          |          
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |                     |          |          |--1.68%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |                     |          |          |          |          
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |                     |          |          |           --1.26%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |                     |          |          |                     |          
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |                     |          |          |                     |--0.65%--main
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |                     |          |          |                     |          __libc_start_call_main
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |                     |          |          |                     |          
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |                     |          |          |                      --0.61%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |                     |          |          |                                quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |                     |          |          |                                quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |                     |          |          |                                quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |                     |          |          |          
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |                     |          |           --0.60%--main
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |                     |          |                     __libc_start_call_main
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |                     |          |          
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |                     |           --0.58%--main
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |                     |                     __libc_start_call_main
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |                     |          
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |                      --1.43%--main
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |                                __libc_start_call_main
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |          |          |          |          
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |          |          |           --0.94%--main
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |          |          |                     __libc_start_call_main
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |          |          |          
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |          |           --0.74%--main
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |          |                     __libc_start_call_main
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |          |          
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |           --0.75%--main
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |                     __libc_start_call_main
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          |          
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |           --0.95%--main
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |                     __libc_start_call_main
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          |          
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |           --0.77%--main
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |                     __libc_start_call_main
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          |          
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |           --1.05%--main
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |                     __libc_start_call_main
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          |          
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |           --2.29%--main
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |                     __libc_start_call_main
+            |          |                     |          |          |          |                     |          |          |          |          |          |          |          
+            |          |                     |          |          |          |                     |          |          |          |          |          |           --1.37%--main
+            |          |                     |          |          |          |                     |          |          |          |          |          |                     __libc_start_call_main
+            |          |                     |          |          |          |                     |          |          |          |          |          |          
+            |          |                     |          |          |          |                     |          |          |          |          |           --1.69%--main
+            |          |                     |          |          |          |                     |          |          |          |          |                     __libc_start_call_main
+            |          |                     |          |          |          |                     |          |          |          |          |          
+            |          |                     |          |          |          |                     |          |          |          |           --1.19%--main
+            |          |                     |          |          |          |                     |          |          |          |                     __libc_start_call_main
+            |          |                     |          |          |          |                     |          |          |          |          
+            |          |                     |          |          |          |                     |          |          |           --1.00%--main
+            |          |                     |          |          |          |                     |          |          |                     __libc_start_call_main
+            |          |                     |          |          |          |                     |          |          |          
+            |          |                     |          |          |          |                     |          |           --1.65%--main
+            |          |                     |          |          |          |                     |          |                     __libc_start_call_main
+            |          |                     |          |          |          |                     |          |          
+            |          |                     |          |          |          |                     |           --1.17%--main
+            |          |                     |          |          |          |                     |                     __libc_start_call_main
+            |          |                     |          |          |          |                     |          
+            |          |                     |          |          |          |                      --0.80%--main
+            |          |                     |          |          |          |                                __libc_start_call_main
+            |          |                     |          |          |          |          
+            |          |                     |          |          |           --1.40%--main
+            |          |                     |          |          |                     __libc_start_call_main
+            |          |                     |          |          |          
+            |          |                     |          |           --1.63%--main
+            |          |                     |          |                     __libc_start_call_main
+            |          |                     |          |          
+            |          |                     |           --1.86%--main
+            |          |                     |                     __libc_start_call_main
+            |          |                     |          
+            |          |                      --0.60%--main
+            |          |                                __libc_start_call_main
+            |          |          
+            |           --1.60%--main
+            |                     __libc_start_call_main
+            |          
+             --5.98%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                       |          
+                        --5.57%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                  quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                  |          
+                                   --5.15%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                             quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                             |          
+                                              --4.74%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                                        quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                                        |          
+                                                        |--4.18%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                                        |          quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                                        |          |          
+                                                        |          |--3.59%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                                        |          |          |          
+                                                        |          |           --3.22%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                                        |          |                     quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                                        |          |                     |          
+                                                        |          |                      --3.04%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                                        |          |                                quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                                        |          |                                quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                                        |          |                                quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                                        |          |                                |          
+                                                        |          |                                |--2.43%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                                        |          |                                |          |          
+                                                        |          |                                |          |--1.64%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                                        |          |                                |          |          |          
+                                                        |          |                                |          |           --1.23%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                                        |          |                                |          |                     quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                                        |          |                                |          |                     |          
+                                                        |          |                                |          |                      --1.03%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                                        |          |                                |          |                                quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                                        |          |                                |          |                                quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                                        |          |                                |          |                                quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                                        |          |                                |          |                                |          
+                                                        |          |                                |          |                                 --0.62%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                                        |          |                                |          |                                           quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                                        |          |                                |          |                                           quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                                        |          |                                |          |                                           quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                                        |          |                                |          |          
+                                                        |          |                                |           --0.79%--main
+                                                        |          |                                |                     __libc_start_call_main
+                                                        |          |                                |          
+                                                        |          |                                 --0.61%--main
+                                                        |          |                                           __libc_start_call_main
+                                                        |          |          
+                                                        |           --0.59%--main
+                                                        |                     __libc_start_call_main
+                                                        |          
+                                                         --0.56%--main
+                                                                   __libc_start_call_main
+
+     5.62%            15  search_1  libc.so.6             [.] __random
+            |          
+             --5.21%--__random
+                       __libc_start_call_main
+
+     4.28%            15  search_1  search_1              [.] std::remove_reference<int&>::type&& std::move<int&>(int&)
+            |          
+            |--3.05%--std::remove_reference<int&>::type&& std::move<int&>(int&)
+            |          std::enable_if<std::__and_<std::__not_<std::__is_tuple_like<int> >, std::is_move_constructible<int>, std::is_move_assignable<int> >::value, void>::type std::swap<int>(int&, int&)
+            |          quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |          
+            |          |--2.45%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |          |          
+            |          |           --2.03%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                     |          
+            |          |                      --1.62%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                                quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                                quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                                |          
+            |          |                                 --1.43%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                                           |          
+            |          |                                            --1.01%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                                                      |          
+            |          |                                                       --0.81%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                                                                 quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                                                                 quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                                                                 quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                                                                 |          
+            |          |                                                                  --0.62%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                                                                            quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                                                                            quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |                                                                            quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |          
+            |           --0.60%--main
+            |                     __libc_start_call_main
+            |          
+             --1.23%--std::enable_if<std::__and_<std::__not_<std::__is_tuple_like<int> >, std::is_move_constructible<int>, std::is_move_assignable<int> >::value, void>::type std::swap<int>(int&, int&)
+                       quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                       quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                       quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                       |          
+                        --0.81%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                  quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                  quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                  quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                  quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                  quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                  quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                  |          
+                                   --0.61%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                             quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                             quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                             quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                             quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                             quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                             quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                             quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                             quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                             quicksort(std::vector<int, std::allocator<int> >&, int, int)
+
+     4.09%            18  search_1  search_1              [.] std::enable_if<std::__and_<std::__not_<std::__is_tuple_like<int> >, std::is_move_constructible<int>, std::is_move_assignable<int> >::value, void>::type std::swap<int>(int&, int&)
+            |          
+            |--2.06%--std::remove_reference<int&>::type&& std::move<int&>(int&)
+            |          quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          |          
+            |           --1.65%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |                     quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |                     quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |                     quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |                     quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |                     quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |                     |          
+            |                      --1.45%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |                                quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |                                |          
+            |                                 --1.39%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |                                           |          
+            |                                            --0.97%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |                                                      |          
+            |                                                       --0.77%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |                                                                 quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |                                                                 quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |                                                                 quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |                                                                 quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |                                                                 quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |                                                                 quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |                                                                 |          
+            |                                                                  --0.58%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |                                                                            quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |                                                                            quicksort(std::vector<int, std::allocator<int> >&, int, int)
+            |          
+             --1.65%--std::enable_if<std::__and_<std::__not_<std::__is_tuple_like<int> >, std::is_move_constructible<int>, std::is_move_assignable<int> >::value, void>::type std::swap<int>(int&, int&)
+                       quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                       quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                       |          
+                        --1.24%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                  quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                  quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                  quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                  |          
+                                   --1.04%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                             quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                             quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                             quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                             |          
+                                              --0.63%--quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                                        quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                                        quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                                        quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                                        quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                                        quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                                        quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                                        quicksort(std::vector<int, std::allocator<int> >&, int, int)
+                                                        quicksort(std::vector<int, std::allocator<int> >&, int, int)
+
+     1.32%             4  search_1  search_1              [.] __gnu_cxx::__enable_if<std::__is_scalar<int>::__value, void>::__type std::__fill_a1<int*, int>(int*, int*, int const&)
+            |
+            ---__gnu_cxx::__enable_if<std::__is_scalar<int>::__value, void>::__type std::__fill_a1<int*, int>(int*, int*, int const&)
+               void std::__fill_a<int*, int>(int*, int*, int const&)
+               int* std::__fill_n_a<int*, unsigned long, int>(int*, unsigned long, int const&, std::random_access_iterator_tag)
+               int* std::fill_n<int*, unsigned long, int>(int*, unsigned long, int const&)
+               int* std::__uninitialized_default_n_1<true>::__uninit_default_n<int*, unsigned long>(int*, unsigned long)
+               int* std::__uninitialized_default_n<int*, unsigned long>(int*, unsigned long)
+               int* std::__uninitialized_default_n_a<int*, unsigned long, int>(int*, unsigned long, std::allocator<int>&)
+               std::vector<int, std::allocator<int> >::_M_default_initialize(unsigned long)
+               std::vector<int, std::allocator<int> >::vector(unsigned long, std::allocator<int> const&)
+               main
+               __libc_start_call_main
+
+     1.17%             3  search_1  search_1              [.] main
+            |
+            ---main
+               __libc_start_call_main
+
+     0.79%             2  search_1  libc.so.6             [.] __random_r
+            |
+            ---__random_r
+               __libc_start_call_main
+
+     0.33%             1  search_1  [unknown]             [k] 0xffffffff8b3d8edf
+     0.33%             1  search_1  [unknown]             [k] 0xffffffff8b66a5d4
+     0.32%             1  search_1  libstdc++.so.6.0.32   [.] std::ios_base_library_init()
+     0.32%             1  search_1  [unknown]             [k] 0xffffffff8b746286
+     0.32%             1  search_1  ld-linux-x86-64.so.2  [.] strcmp
+     0.31%             1  search_1  [unknown]             [k] 0xffffffff8c38bfb9
+     0.31%             1  search_1  ld-linux-x86-64.so.2  [.] do_lookup_x
+     0.31%             1  search_1  ld-linux-x86-64.so.2  [.] _dl_relocate_object
+     0.30%             1  search_1  [unknown]             [k] 0xffffffff8b5c329b
+     0.29%             1  search_1  [unknown]             [k] 0xffffffff8c3a1821
+     0.27%             1  search_1  [unknown]             [k] 0xffffffff8c38f09c
+     0.25%             1  search_1  [unknown]             [k] 0xffffffff8c38e786
+     0.24%             1  search_1  [unknown]             [k] 0xffffffff8c43da23
+     0.24%             1  search_1  [unknown]             [k] 0xffffffff8b614f6a
+     0.20%             1  search_1  ld-linux-x86-64.so.2  [.] intel_check_word.constprop.0
+     0.20%             1  search_1  [unknown]             [k] 0xffffffff8c38c029
+     0.20%             1  search_1  [unknown]             [k] 0xffffffff8b6ca221
+     0.20%             1  search_1  libm.so.6             [.] _fini
+     0.19%             1  search_1  [unknown]             [k] 0xffffffff8b5a0f5d
+     0.18%             1  search_1  [unknown]             [k] 0xffffffff8b3e97b6
+     0.16%             1  search_1  [unknown]             [k] 0xffffffff8b66929e
+     0.10%             1  search_1  [unknown]             [k] 0xffffffff8b614f4b
+     0.07%             1  search_1  [unknown]             [k] 0xffffffff8b620300
+     0.07%             1  search_1  [unknown]             [k] 0xffffffff8b7ed510
+
+
+#
+# (Cannot load tips.txt file, please install perf!)
+#

@@ -1,0 +1,182 @@
+[3735200a3fe] {jit-log-opt-loop
+# Loop 1 (two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-34~#12 FOR_ITER) : loop with 81 ops
+[p0, p1]
++283: i2 = getfield_gc_i(p0, descr=<FieldS pypy.interpreter.pyframe.PyFrame.inst_last_instr 40>)
++294: p3 = getfield_gc_r(p0, descr=<FieldP pypy.interpreter.pyframe.PyFrame.inst_pycode 64>)
++298: i4 = getfield_gc_i(p0, descr=<FieldS pypy.interpreter.pyframe.PyFrame.inst_valuestackdepth 72>)
++302: p5 = getfield_gc_r(p0, descr=<FieldP pypy.interpreter.pyframe.PyFrame.inst_debugdata 16>)
++306: p6 = getfield_gc_r(p0, descr=<FieldP pypy.interpreter.pyframe.PyFrame.inst_lastblock 48>)
++310: p7 = getfield_gc_r(p0, descr=<FieldP pypy.interpreter.pyframe.PyFrame.inst_locals_cells_stack_w 56>)
++314: p9 = getarrayitem_gc_r(p7, 0, descr=<ArrayP 8>)
++318: p11 = getarrayitem_gc_r(p7, 1, descr=<ArrayP 8>)
++322: p13 = getarrayitem_gc_r(p7, 2, descr=<ArrayP 8>)
++326: p15 = getarrayitem_gc_r(p7, 3, descr=<ArrayP 8>)
++330: p17 = getarrayitem_gc_r(p7, 4, descr=<ArrayP 8>)
++334: p19 = getarrayitem_gc_r(p7, 5, descr=<ArrayP 8>)
++338: p21 = getarrayitem_gc_r(p7, 6, descr=<ArrayP 8>)
++342: p23 = getarrayitem_gc_r(p7, 7, descr=<ArrayP 8>)
++353: p25 = getarrayitem_gc_r(p7, 8, descr=<ArrayP 8>)
++364: p27 = getarrayitem_gc_r(p7, 9, descr=<ArrayP 8>)
++375: p29 = getarrayitem_gc_r(p7, 10, descr=<ArrayP 8>)
++386: p31 = getarrayitem_gc_r(p7, 11, descr=<ArrayP 8>)
++397: label(p0, p1, i2, p3, i4, p5, p6, p9, p11, p13, p15, p17, p19, p21, p23, p25, p27, p29, p31, descr=TargetToken(125132203643808))
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-34~#12 FOR_ITER')
++448: guard_value(i4, 9, descr=<Guard0x71ce9c90e390>) [p0, i2, p3, i4, p5, p6, p9, p11, p13, p15, p17, p19, p21, p23, p25, p27, p29, p31, p1]
++458: guard_isnull(p5, descr=<Guard0x71ce9c8f7d38>) [p0, i2, p3, i4, p5, p6, p9, p11, p13, p15, p17, p19, p21, p23, p25, p27, p29, p31, p1]
++467: guard_class(p25, 125132256587976, descr=<Guard0x71ce9c8f7d70>) [p0, i2, p3, i4, p5, p6, p9, p11, p13, p15, p17, p19, p21, p23, p25, p27, p29, p31, p1]
++479: i34 = getfield_gc_i(p25, descr=<FieldS pypy.module.__builtin__.functional.W_IntRangeIterator.inst_current 8>)
++483: i35 = getfield_gc_i(p25, descr=<FieldS pypy.module.__builtin__.functional.W_IntRangeOneArgIterator.inst_stop 40 pure>)
++487: i36 = int_lt(i34, i35)
++490: guard_true(i36, descr=<Guard0x71ce9c8f7da8>) [p0, i2, p3, i4, p5, p6, p9, p11, p13, p15, p17, p19, p21, p23, p25, p27, p29, p31, p1]
++496: i38 = int_add(i34, 1)
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-34~#14 STORE_FAST')
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-35~#16 LOAD_GLOBAL')
++500: setfield_gc(p25, i38, descr=<FieldS pypy.module.__builtin__.functional.W_IntRangeIterator.inst_current 8>)
++511: guard_value(p3, ConstPtr(ptr39), descr=<Guard0x71ce9c90e3e0>) [p0, p3, p6, p9, p11, p15, p17, p19, p21, p23, p25, p29, p31, p1, i34]
++520: guard_not_invalidated(descr=<Guard0x71ce9c8f7de0>) [p0, p3, p6, p9, p11, p15, p17, p19, p21, p23, p25, p29, p31, p1, i34]
++527: i41 = getfield_gc_i(ConstPtr(ptr40), descr=<FieldS pypy.objspace.std.typeobject.IntMutableCell.inst_intvalue 8>)
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-35~#18 LOAD_CONST')
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-35~#20 INPLACE_ADD')
++531: i43 = int_add_ovf(i41, 1)
++535: guard_no_overflow(descr=<Guard0x71ce9c8f7e18>) [p0, p3, p6, p9, p11, p15, p17, p19, p21, p23, p25, p29, p31, p1, i34]
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-35~#22 STORE_GLOBAL')
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-36~#24 LOAD_FAST')
++541: setfield_gc(ConstPtr(ptr44), i43, descr=<FieldS pypy.objspace.std.typeobject.IntMutableCell.inst_intvalue 8>)
++545: guard_nonnull_class(p11, ConstClass(W_IntObject), descr=<Guard0x71ce9c90e430>) [p0, p6, p9, p11, p15, p17, p19, p21, p23, p25, p31, p1, i34]
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-36~#26 LOAD_FAST')
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-36~#28 INPLACE_ADD')
++564: i46 = getfield_gc_i(p11, descr=<FieldS pypy.objspace.std.intobject.W_IntObject.inst_intval 8 pure>)
++568: i47 = int_add_ovf(i46, i34)
++571: guard_no_overflow(descr=<Guard0x71ce9c8f7e50>) [p0, p6, p9, p11, p15, p17, p19, p21, p23, p25, p31, p1, i34]
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-36~#30 STORE_FAST')
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-36~#32 JUMP_ABSOLUTE')
++577: i49 = getfield_raw_i(125132274021536, descr=<FieldS pypysig_long_struct_inner.c_value 0>)
++590: i51 = int_lt(i49, 0)
++594: guard_false(i51, descr=<Guard0x71ce9c8f7e88>) [p0, p6, p9, p11, p15, p17, p19, p21, p23, p25, p31, p1, i34]
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-34~#12 FOR_ITER')
++600: i52 = same_as_i(i38)
++603: label(p0, p1, p6, p9, i47, i34, p15, p17, p19, p21, p23, p25, p31, i52, i35, i43, descr=TargetToken(125132203644128))
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-34~#12 FOR_ITER')
++624: i53 = int_lt(i52, i35)
++627: guard_true(i53, descr=<Guard0x71ce9c90e480>) [p0, p6, p9, p15, p17, p19, p21, p23, p25, p31, p1, i52, i35, i34, i47]
++633: i55 = int_add(i52, 1)
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-34~#14 STORE_FAST')
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-35~#16 LOAD_GLOBAL')
++637: setfield_gc(p25, i55, descr=<FieldS pypy.module.__builtin__.functional.W_IntRangeIterator.inst_current 8>)
++641: guard_not_invalidated(descr=<Guard0x71ce9c90e4d0>) [p0, p6, p9, p15, p17, p19, p21, p23, p25, p31, p1, i52, None, i47]
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-35~#18 LOAD_CONST')
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-35~#20 INPLACE_ADD')
++641: i58 = int_add_ovf(i43, 1)
++645: guard_no_overflow(descr=<Guard0x71ce9c8f7ec0>) [p0, p6, p9, p15, p17, p19, p21, p23, p25, p31, p1, i52, None, i47]
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-35~#22 STORE_GLOBAL')
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-36~#24 LOAD_FAST')
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-36~#26 LOAD_FAST')
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-36~#28 INPLACE_ADD')
++658: setfield_gc(ConstPtr(ptr59), i58, descr=<FieldS pypy.objspace.std.typeobject.IntMutableCell.inst_intvalue 8>)
++662: i60 = int_add_ovf(i47, i52)
++668: guard_no_overflow(descr=<Guard0x71ce9c90e520>) [p0, p6, p9, p15, p17, p19, p21, p23, p25, p31, p1, i47, i52, None, None, None]
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-36~#30 STORE_FAST')
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-36~#32 JUMP_ABSOLUTE')
++674: i62 = getfield_raw_i(125132274021536, descr=<FieldS pypysig_long_struct_inner.c_value 0>)
++687: i64 = int_lt(i62, 0)
++691: guard_false(i64, descr=<Guard0x71ce9c8f7ef8>) [p0, p6, p9, p15, p17, p19, p21, p23, p25, p31, p1, i47, i52, None, None, None]
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-34~#12 FOR_ITER')
++697: jump(p0, p1, p6, p9, i60, i52, p15, p17, p19, p21, p23, p25, p31, i55, i35, i58, descr=TargetToken(125132203644128))
++720: --end of the loop--
+[3735206ea39] jit-log-opt-loop}
+[373521a83b7] {jit-log-opt-loop
+# Loop 2 (two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-41~#70 FOR_ITER) : loop with 91 ops
+[p0, p1]
++299: i2 = getfield_gc_i(p0, descr=<FieldS pypy.interpreter.pyframe.PyFrame.inst_last_instr 40>)
++310: p3 = getfield_gc_r(p0, descr=<FieldP pypy.interpreter.pyframe.PyFrame.inst_pycode 64>)
++314: i4 = getfield_gc_i(p0, descr=<FieldS pypy.interpreter.pyframe.PyFrame.inst_valuestackdepth 72>)
++318: p5 = getfield_gc_r(p0, descr=<FieldP pypy.interpreter.pyframe.PyFrame.inst_debugdata 16>)
++322: p6 = getfield_gc_r(p0, descr=<FieldP pypy.interpreter.pyframe.PyFrame.inst_lastblock 48>)
++326: p7 = getfield_gc_r(p0, descr=<FieldP pypy.interpreter.pyframe.PyFrame.inst_locals_cells_stack_w 56>)
++330: p9 = getarrayitem_gc_r(p7, 0, descr=<ArrayP 8>)
++334: p11 = getarrayitem_gc_r(p7, 1, descr=<ArrayP 8>)
++338: p13 = getarrayitem_gc_r(p7, 2, descr=<ArrayP 8>)
++342: p15 = getarrayitem_gc_r(p7, 3, descr=<ArrayP 8>)
++346: p17 = getarrayitem_gc_r(p7, 4, descr=<ArrayP 8>)
++350: p19 = getarrayitem_gc_r(p7, 5, descr=<ArrayP 8>)
++354: p21 = getarrayitem_gc_r(p7, 6, descr=<ArrayP 8>)
++358: p23 = getarrayitem_gc_r(p7, 7, descr=<ArrayP 8>)
++369: p25 = getarrayitem_gc_r(p7, 8, descr=<ArrayP 8>)
++380: p27 = getarrayitem_gc_r(p7, 9, descr=<ArrayP 8>)
++391: p29 = getarrayitem_gc_r(p7, 10, descr=<ArrayP 8>)
++402: p31 = getarrayitem_gc_r(p7, 11, descr=<ArrayP 8>)
++413: label(p0, p1, i2, p3, i4, p5, p6, p9, p11, p13, p15, p17, p19, p21, p23, p25, p27, p29, p31, descr=TargetToken(125132203644704))
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-41~#70 FOR_ITER')
++464: guard_value(i4, 9, descr=<Guard0x71ce9c90e570>) [p0, i2, p3, i4, p5, p6, p9, p11, p13, p15, p17, p19, p21, p23, p25, p27, p29, p31, p1]
++474: guard_isnull(p5, descr=<Guard0x71ce9c91e368>) [p0, i2, p3, i4, p5, p6, p9, p11, p13, p15, p17, p19, p21, p23, p25, p27, p29, p31, p1]
++483: guard_class(p25, 125132256587976, descr=<Guard0x71ce9c91e3a0>) [p0, i2, p3, i4, p5, p6, p9, p11, p13, p15, p17, p19, p21, p23, p25, p27, p29, p31, p1]
++496: i34 = getfield_gc_i(p25, descr=<FieldS pypy.module.__builtin__.functional.W_IntRangeIterator.inst_current 8>)
++500: i35 = getfield_gc_i(p25, descr=<FieldS pypy.module.__builtin__.functional.W_IntRangeOneArgIterator.inst_stop 40 pure>)
++504: i36 = int_lt(i34, i35)
++507: guard_true(i36, descr=<Guard0x71ce9c91e3d8>) [p0, i2, p3, i4, p5, p6, p9, p11, p13, p15, p17, p19, p21, p23, p25, p27, p29, p31, p1]
++513: i38 = int_add(i34, 1)
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-41~#72 STORE_FAST')
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-42~#74 LOAD_GLOBAL')
++517: setfield_gc(p25, i38, descr=<FieldS pypy.module.__builtin__.functional.W_IntRangeIterator.inst_current 8>)
++528: guard_value(p3, ConstPtr(ptr39), descr=<Guard0x71ce9c90e5c0>) [p0, p3, p6, p9, p11, p13, p15, p17, p19, p21, p25, p29, p31, p1, i34]
++537: guard_not_invalidated(descr=<Guard0x71ce9c91e410>) [p0, p3, p6, p9, p11, p13, p15, p17, p19, p21, p25, p29, p31, p1, i34]
++544: i41 = getfield_gc_i(ConstPtr(ptr40), descr=<FieldS pypy.objspace.std.typeobject.IntMutableCell.inst_intvalue 8>)
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-42~#76 LOAD_CONST')
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-42~#78 INPLACE_ADD')
++548: i43 = int_add_ovf(i41, 1)
++552: guard_no_overflow(descr=<Guard0x71ce9c91e448>) [p0, p3, p6, p9, p11, p13, p15, p17, p19, p21, p25, p29, p31, p1, i34]
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-42~#80 STORE_GLOBAL')
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-43~#82 LOAD_FAST')
++558: setfield_gc(ConstPtr(ptr44), i43, descr=<FieldS pypy.objspace.std.typeobject.IntMutableCell.inst_intvalue 8>)
++562: guard_nonnull_class(p21, ConstClass(W_IntObject), descr=<Guard0x71ce9c90e610>) [p0, p6, p9, p11, p13, p15, p17, p19, p21, p25, p31, p1, i34]
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-43~#84 LOAD_FAST')
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-43~#86 LOAD_FAST')
++580: guard_nonnull_class(p19, ConstClass(W_IntObject), descr=<Guard0x71ce9c90e660>) [p0, p6, p9, p11, p13, p15, p17, p19, p21, p25, p31, p1, i34]
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-43~#88 BINARY_MULTIPLY')
++599: i47 = getfield_gc_i(p19, descr=<FieldS pypy.objspace.std.intobject.W_IntObject.inst_intval 8 pure>)
++603: i48 = int_mul_ovf(i34, i47)
++610: guard_no_overflow(descr=<Guard0x71ce9c91e480>) [p0, p6, p9, p11, p13, p15, p17, p19, p21, p25, p31, p1, i34]
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-43~#90 INPLACE_ADD')
++616: i49 = getfield_gc_i(p21, descr=<FieldS pypy.objspace.std.intobject.W_IntObject.inst_intval 8 pure>)
++620: i50 = int_add_ovf(i49, i48)
++623: guard_no_overflow(descr=<Guard0x71ce9c91e4b8>) [p0, p6, p9, p11, p13, p15, p17, p19, p21, p25, p31, p1, i34]
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-43~#92 STORE_FAST')
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-43~#94 JUMP_ABSOLUTE')
++629: i52 = getfield_raw_i(125132274021536, descr=<FieldS pypysig_long_struct_inner.c_value 0>)
++642: i54 = int_lt(i52, 0)
++646: guard_false(i54, descr=<Guard0x71ce9c91e4f0>) [p0, p6, p9, p11, p13, p15, p17, p19, p21, p25, p31, p1, i34]
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-41~#70 FOR_ITER')
++652: i55 = same_as_i(i38)
++655: label(p0, p1, p6, p9, p11, p13, p15, p17, p19, i50, i34, p25, i55, i35, i43, i47, descr=TargetToken(125132203645088))
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-41~#70 FOR_ITER')
++672: i56 = int_lt(i55, i35)
++675: guard_true(i56, descr=<Guard0x71ce9c90e6b0>) [p0, p6, p9, p11, p13, p15, p17, p19, p25, p1, i55, i35, i34, i50]
++681: i58 = int_add(i55, 1)
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-41~#72 STORE_FAST')
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-42~#74 LOAD_GLOBAL')
++685: setfield_gc(p25, i58, descr=<FieldS pypy.module.__builtin__.functional.W_IntRangeIterator.inst_current 8>)
++689: guard_not_invalidated(descr=<Guard0x71ce9c90e700>) [p0, p6, p9, p11, p13, p15, p17, p19, p25, p1, i55, None, i50]
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-42~#76 LOAD_CONST')
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-42~#78 INPLACE_ADD')
++689: i61 = int_add_ovf(i43, 1)
++693: guard_no_overflow(descr=<Guard0x71ce9c91e528>) [p0, p6, p9, p11, p13, p15, p17, p19, p25, p1, i55, None, i50]
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-42~#80 STORE_GLOBAL')
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-43~#82 LOAD_FAST')
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-43~#84 LOAD_FAST')
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-43~#86 LOAD_FAST')
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-43~#88 BINARY_MULTIPLY')
++706: setfield_gc(ConstPtr(ptr62), i61, descr=<FieldS pypy.objspace.std.typeobject.IntMutableCell.inst_intvalue 8>)
++710: i63 = int_mul_ovf(i55, i47)
++717: guard_no_overflow(descr=<Guard0x71ce9c90e750>) [p0, p6, p9, p11, p13, p15, p17, p19, p25, p1, i55, i47, None, None, i50]
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-43~#90 INPLACE_ADD')
++723: i64 = int_add_ovf(i50, i63)
++729: guard_no_overflow(descr=<Guard0x71ce9c91e560>) [p0, p6, p9, p11, p13, p15, p17, p19, p25, p1, i55, i47, None, None, i50]
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-43~#92 STORE_FAST')
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-43~#94 JUMP_ABSOLUTE')
++735: i66 = getfield_raw_i(125132274021536, descr=<FieldS pypysig_long_struct_inner.c_value 0>)
++748: i68 = int_lt(i66, 0)
++752: guard_false(i68, descr=<Guard0x71ce9c91e598>) [p0, p6, p9, p11, p13, p15, p17, p19, p25, p1, i55, i47, None, None, i50]
+debug_merge_point(0, 0, 'two_loops_series;/home/chandra/code/assignment/Assignment/Week 1/q1.py:31-41~#70 FOR_ITER')
++758: jump(p0, p1, p6, p9, p11, p13, p15, p17, p19, i64, i55, p25, i58, i35, i61, i47, descr=TargetToken(125132203645088))
++784: --end of the loop--
+[373521e9640] jit-log-opt-loop}
