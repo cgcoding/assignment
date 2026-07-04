@@ -1,2 +1,0 @@
-Additional notes from the student.
-The grader should ignore this file during evaluation.

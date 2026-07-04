@@ -1,1 +1,0 @@
-../../mock_grading/submissions/220010003.cpp

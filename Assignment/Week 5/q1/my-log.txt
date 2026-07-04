@@ -1,4 +1,0 @@
-* 14d961f (HEAD -> main, origin/thisisabetteridea, origin/main, origin/HEAD) feat: The Better Idea
-* 6ea27ea Fix: Adding Login Prompts
-* 0d835a0 Adding README
-* e898d19 feat: Login API
