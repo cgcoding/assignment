@@ -204,6 +204,50 @@ conformance checks:
   3-cluster run matches a naive loop-based reference k-means **exactly** (centers to
   1e-9, labels identical).
 
+### Lecture alignment (basic-python.pdf, checked 2026-07-06)
+
+The Basic Python lecture ([Resources/basic-python.pdf](Resources/basic-python.pdf)) was
+audited against all six scripts. Practices it prescribes that the solutions follow:
+
+- **`main()` + `if __name__ == "__main__":` convention** (slide 4) - all six scripts.
+- **Explicit imports at the top, never `from module import *`** (slide 36) - all six.
+- **List comprehensions where natural** (slide 13) - used in `q2/projectile.py` input
+  parsing; deliberately absent from `q3/delivery_hub.py`, whose spec forbids them
+  (AST-verified: 0 comprehensions).
+- **No leaked file handles** (slide 39's `with open(...)` concern) - all file I/O goes
+  through pandas / `np.loadtxt` / `sys.stdin`, which manage lifecycles internally.
+- **`pathlib.Path` over manual string manipulation** (slide 40) - the four Q1 scripts
+  originally used `os.path.dirname/abspath/join`; on 2026-07-06 they were switched to
+  `Path(__file__).resolve().parent / "..."`. No behavior change (pandas accepts `Path`).
+- **Virtual environments and pip** (slide 43) - execution/validation runs in an isolated
+  venv, as documented below.
+
+Lecture topics not applicable here: regex (`re`), `sys.argv` (Q2 reads stdin per spec,
+Q1 filenames are fixed by spec), exceptions (no recoverable-error paths in these batch
+scripts), and classes (the specs prescribe function-based structure).
+
+### Revalidation (2026-07-06, third pass - after pathlib switch)
+
+Fresh venv (Python 3.12.3, pandas 3.0.3, numpy 2.5.1, scipy 1.18.0); spec-named input
+copies regenerated from [Resources/](Resources). All six scripts re-run end to end:
+
+- **Task 1** - all 11 spec columns in order, 6 (pclass, sex) groups; every one of the 9
+  computed columns matches an independent brute-force recomputation (loops/dicts, sample
+  std ddof=1, stable fare sort, trailing window of 5) to 1e-9; dense ranks correct per
+  class.
+- **Task 2** - PDF example `[7,2,0,3,4,2,5,0,3,4] -> [1,2,0,1,2,3,4,0,1,2]` reproduced
+  exactly; real input matches a running-counter loop on all 15 rows.
+- **Task 3** - the PDF's 16-row worked example reproduced to 1e-5 on every row; real
+  input matches a manual last-3 NaN-skipping mean on all 12 rows.
+- **Task 4** - all 16 cells match a double-loop neighbour count; hazards NaN;
+  rows = y, columns = x.
+- **Q2** - PDF sample -> `MISS`; a synthetic ground-truth scenario (K = 0.02, 50 deg,
+  speed 120, t_obs = 5) built to pass through the simulated interceptor path reports
+  `HIT 7.904` against a 4M-sample reference of 7.90354 - within the required 1e-3.
+- **Q3** - PDF 6-point sample reproduces the expected output exactly (centers
+  `[[1.3333, 1.3333], [8.3333, 8.3333]]`, labels `[0 0 0 1 1 1]`); AST check confirms
+  0 for loops, 0 comprehensions, exactly 1 while, and all 8 required functions present.
+
 **Remaining caveats**
 
 - Q2/Q3 hidden test cases obviously could not be run; the implementations avoid hardcoded

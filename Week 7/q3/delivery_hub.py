@@ -1,8 +1,7 @@
-"""Q3 - Optimizing Delivery Hubs (vectorized K-Means).
+"""Q3: Optimizing Delivery Hubs with vectorized K-Means.
 
-Implements K-Means with pure NumPy vectorization: no for loops, list
-comprehensions, or any iteration over the dataset or the clusters. The only
-loop is the `while True:` convergence loop in kmeans().
+The only loop is the while loop controlling the convergence iterations;
+everything else is vectorized numpy.
 """
 
 import time
@@ -29,11 +28,7 @@ def initialise_labels(data):
 
 
 def calculate_distances(data, centers):
-    """Euclidean distance from each of N points to each of K hubs (N x K).
-
-    Broadcasting: data reshaped to (N, 1, 2) against centers (K, 2) yields
-    an (N, K, 2) difference tensor; the norm over the last axis gives (N, K).
-    """
+    """Euclidean distance from each of N points to each of K hubs (N x K)."""
     diff = data[:, np.newaxis, :] - centers[np.newaxis, :, :]
     return np.sqrt(np.sum(diff**2, axis=2))
 
@@ -46,16 +41,13 @@ def update_labels(distances):
 def update_centers(data, labels, K):
     """Move each hub to the mean of its assigned points.
 
-    A Boolean mask of shape (K, N) compares labels to np.arange(K); its dot
-    product with the data matrix sums member coordinates per cluster, and a
-    per-cluster member count normalizes to the mean. Empty clusters keep a
-    zero count guarded to 1 to avoid division by zero (their center becomes
-    the origin of the mask sum, i.e. 0/1 = 0; they are then re-labelled on
-    the next assignment step).
+    The (K, N) boolean mask against np.arange(K), multiplied with the data
+    matrix, sums the member coordinates per cluster without a loop over K.
+    The count is clamped to 1 so an empty cluster does not divide by zero.
     """
-    mask = labels == np.arange(K)[:, np.newaxis]  # (K, N) boolean
-    counts = mask.sum(axis=1, keepdims=True)  # (K, 1)
-    sums = mask @ data  # (K, 2)
+    mask = labels == np.arange(K)[:, np.newaxis]
+    counts = mask.sum(axis=1, keepdims=True)
+    sums = mask @ data
     return sums / np.maximum(counts, 1)
 
 
@@ -85,7 +77,6 @@ def kmeans(data_path, K, init_centers=None):
 
 
 if __name__ == "__main__":
-    # Sample execution from the assignment (deterministic initial centers).
     init_centers = [[1.0, 1.0], [8.0, 8.0]]
     final_centers, labels, exec_time = kmeans(
         "delivery_locations.txt", 2, init_centers

@@ -1,0 +1,37 @@
+<section class="habit-container">
+  <h2>Habit Manager</h2>
+
+  <form (ngSubmit)="addHabit()" class="habit-form">
+    <label for="habitName">Habit Name</label>
+    <input id="habitName" type="text" name="habitName" [(ngModel)]="newHabit.name" required />
+
+    <label for="frequency">Frequency</label>
+    <select id="frequency" name="frequency" [(ngModel)]="newHabit.frequency">
+      <option value="daily">Daily</option>
+      <option value="weekly">Weekly</option>
+      <option value="monthly">Monthly</option>
+    </select>
+
+    <button type="submit">Save Habit</button>
+  </form>
+
+  <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
+
+  <ul>
+    <li *ngFor="let habit of habits">
+      <span>#{{ habit.id }} - {{ habit.name }} ({{ habit.frequency }})</span>
+      <div>
+        <label [for]="'date-' + habit.id">Date</label>
+        <input
+          [id]="'date-' + habit.id"
+          type="date"
+          [name]="'date-' + habit.id"
+          [ngModel]="completionDateByHabitId[habit.id] || today()"
+          (ngModelChange)="completionDateByHabitId[habit.id] = $event"
+        />
+        <button type="button" (click)="markComplete(habit.id)">Complete</button>
+        <button type="button" (click)="deleteHabit(habit.id)">Delete</button>
+      </div>
+    </li>
+  </ul>
+</section>
