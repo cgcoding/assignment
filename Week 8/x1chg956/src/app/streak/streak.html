@@ -1,0 +1,26 @@
+<div class="streak-container">
+	<div class="streak-header">
+		<h2>Habit Streaks</h2>
+		<a routerLink="/habit">Back to Habits</a>
+	</div>
+
+	<p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+	<div *ngIf="streaks.length === 0 && !errorMessage" class="empty-state">
+		No streak data yet. Complete a habit to begin tracking streaks.
+	</div>
+
+	<ul *ngIf="streaks.length > 0" class="streak-list">
+		<li *ngFor="let streak of streaks" class="streak-item">
+			<div>
+				<strong>{{ streak.name }}</strong>
+				<span>Frequency: {{ streak.frequency }}</span>
+			</div>
+			<div class="streak-values">
+				<span>Current: {{ streak.current_streak }}</span>
+				<span>Longest: {{ streak.longest_streak }}</span>
+				<span>Last completed: {{ streak.last_completed_date || 'Not yet completed' }}</span>
+			</div>
+		</li>
+	</ul>
+</div>

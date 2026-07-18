@@ -1,0 +1,48 @@
+<div class="habit-container">
+	<h2>Habit Tracker</h2>
+
+	<form (ngSubmit)="addHabit()" class="habit-form">
+		<label for="habitName">Habit Name</label>
+		<input
+			id="habitName"
+			type="text"
+			name="habitName"
+			required
+			[(ngModel)]="newHabit.name"
+			placeholder="e.g. Revise Angular"
+		/>
+
+		<label for="habitFrequency">Frequency</label>
+		<select
+			id="habitFrequency"
+			name="habitFrequency"
+			required
+			[(ngModel)]="newHabit.frequency"
+		>
+			<option value="daily">Daily</option>
+			<option value="weekly">Weekly</option>
+		</select>
+
+		<button type="submit">Save Habit</button>
+	</form>
+
+	<p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+	<p class="success" *ngIf="successMessage">{{ successMessage }}</p>
+
+	<div *ngIf="habits.length === 0" class="empty-state">
+		No habits yet. Add your first habit above.
+	</div>
+
+	<ul *ngIf="habits.length > 0" class="habit-list">
+		<li *ngFor="let habit of habits" class="habit-item">
+			<div class="habit-details">
+				<strong>{{ habit.name }}</strong>
+				<span>Frequency: {{ habit.frequency }}</span>
+			</div>
+			<div class="habit-actions">
+				<button type="button" (click)="markComplete(habit.id)">Complete</button>
+				<button type="button" class="danger" (click)="deleteHabit(habit.id)">Delete</button>
+			</div>
+		</li>
+	</ul>
+</div>
