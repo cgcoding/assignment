@@ -1,48 +1,35 @@
 <div class="habit-container">
-	<h2>Habit Tracker</h2>
-
-	<form (ngSubmit)="addHabit()" class="habit-form">
-		<label for="habitName">Habit Name</label>
-		<input
-			id="habitName"
-			type="text"
-			name="habitName"
-			required
-			[(ngModel)]="newHabit.name"
-			placeholder="e.g. Revise Angular"
-		/>
-
-		<label for="habitFrequency">Frequency</label>
-		<select
-			id="habitFrequency"
-			name="habitFrequency"
-			required
-			[(ngModel)]="newHabit.frequency"
-		>
-			<option value="daily">Daily</option>
-			<option value="weekly">Weekly</option>
-		</select>
-
-		<button type="submit">Save Habit</button>
-	</form>
-
-	<p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
-	<p class="success" *ngIf="successMessage">{{ successMessage }}</p>
-
-	<div *ngIf="habits.length === 0" class="empty-state">
-		No habits yet. Add your first habit above.
+	<div class="nav">
+		<a routerLink="/streak">View Streaks</a>
+		&nbsp;&nbsp;
+		<button type="button" (click)="logout()">Logout</button>
 	</div>
 
-	<ul *ngIf="habits.length > 0" class="habit-list">
-		<li *ngFor="let habit of habits" class="habit-item">
-			<div class="habit-details">
-				<strong>{{ habit.name }}</strong>
-				<span>Frequency: {{ habit.frequency }}</span>
-			</div>
-			<div class="habit-actions">
-				<button type="button" (click)="markComplete(habit.id)">Complete</button>
-				<button type="button" class="danger" (click)="deleteHabit(habit.id)">Delete</button>
-			</div>
+	<h2>Add / Edit Habits</h2>
+
+	<form (ngSubmit)="onSubmit()">
+		<label for="habitName">Habit name:</label>
+		<input id="habitName" type="text" [(ngModel)]="newHabit.name" name="habitName" required />
+		&nbsp;&nbsp;
+		<label for="habitFrequency">Frequency:</label>
+		<select id="habitFrequency" [(ngModel)]="newHabit.frequency" name="habitFrequency">
+			<option value="Daily">Daily</option>
+			<option value="Weekly">Weekly</option>
+		</select>
+		&nbsp;&nbsp;
+		<button type="submit">Save</button>
+	</form>
+
+	<div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+
+	<ol>
+		<li *ngFor="let habit of habits; let i = index">
+			{{ i + 1 }} — {{ habit.name }} — {{ habit.frequency }}
+			&nbsp;
+			<button type="button" (click)="completeHabit(habit)" [disabled]="habit.completed">
+				{{ habit.completed ? 'Completed' : 'Complete' }}
+			</button>
+			<button type="button" (click)="deleteHabit(habit)">Delete</button>
 		</li>
-	</ul>
+	</ol>
 </div>

@@ -1,26 +1,28 @@
 <div class="streak-container">
-	<div class="streak-header">
-		<h2>Habit Streaks</h2>
+	<div class="nav">
 		<a routerLink="/habit">Back to Habits</a>
+		&nbsp;&nbsp;
+		<button type="button" (click)="logout()">Logout</button>
 	</div>
 
-	<p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+	<h2>Habit Streak</h2>
 
-	<div *ngIf="streaks.length === 0 && !errorMessage" class="empty-state">
-		No streak data yet. Complete a habit to begin tracking streaks.
+	<label for="habitSelect">Select Habit:</label>
+	<select id="habitSelect" [(ngModel)]="selectedHabitId" name="habitSelect">
+		<option [ngValue]="null" disabled selected>-- choose a habit --</option>
+		<option *ngFor="let h of habits" [ngValue]="h.habitId">{{ h.name }} -- {{ h.frequency }}</option>
+	</select>
+	&nbsp;&nbsp;
+	<button type="button" (click)="calculateStreak()" [disabled]="selectedHabitId === null">
+		Calculate streak
+	</button>
+
+	<div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+
+	<div *ngIf="streakCount !== null">
+		<p *ngIf="streakCount > 0">
+			Current Streak: {{ streakCount }} {{ selectedHabit?.frequency === 'Daily' ? 'days' : 'weeks' }}
+		</p>
+		<p *ngIf="streakCount === 0">No streak yet — complete this habit to get one started.</p>
 	</div>
-
-	<ul *ngIf="streaks.length > 0" class="streak-list">
-		<li *ngFor="let streak of streaks" class="streak-item">
-			<div>
-				<strong>{{ streak.name }}</strong>
-				<span>Frequency: {{ streak.frequency }}</span>
-			</div>
-			<div class="streak-values">
-				<span>Current: {{ streak.current_streak }}</span>
-				<span>Longest: {{ streak.longest_streak }}</span>
-				<span>Last completed: {{ streak.last_completed_date || 'Not yet completed' }}</span>
-			</div>
-		</li>
-	</ul>
 </div>

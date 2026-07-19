@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from models import User
 from database import engine, Base, get_db
 from sqlalchemy.orm import Session
-from passlib.hash import pbkdf2_sha256
+from passlib.hash import bcrypt
 from datetime import timedelta
 from jwt_tokens import create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES
 from schemas import AuthRequest, AuthResponse
@@ -23,7 +23,7 @@ def signup(data: AuthRequest, db: Session = Depends(get_db)):
     if existing_user:
         raise HTTPException(status_code=400, detail="User already exists")
 
-    hashed_pw = pbkdf2_sha256.hash(data.password)
+    hashed_pw = bcrypt.hash(data.password)
     user = User(email=data.email, hashed_password=hashed_pw)
     db.add(user)
     db.commit()
@@ -40,7 +40,7 @@ def signup(data: AuthRequest, db: Session = Depends(get_db)):
 @router.post("/login", response_model=AuthResponse)
 def login(data: AuthRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter_by(email=data.email).first()
-    if not user or not pbkdf2_sha256.verify(data.password, user.hashed_password):
+    if not user or not bcrypt.verify(data.password, user.hashed_password):
         raise HTTPException(
             status_code=400, detail="Invalid email or password")
 

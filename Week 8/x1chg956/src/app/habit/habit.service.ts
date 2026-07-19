@@ -1,61 +1,39 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
-import { Habit, HabitCompletionIn, HabitStreak } from './habit.model';
+import { Habit, Frequency, Completion } from './habit.model';
 
 @Injectable({
 	providedIn: 'root'
 })
 export class HabitService {
-	private apiUrl = 'http://localhost:8000/api/habit';
+	private apiUrl = 'http://localhost:8000/api/habit'; // Adjust to your backend's URL
 
 	constructor(private http: HttpClient) { }
 
-	private getAuthHeaders(): HttpHeaders {
-		let headers = new HttpHeaders({
-			'Content-Type': 'application/json'
-		});
-
-		if (typeof window === 'undefined') {
-			return headers;
-		}
-
+	private authHeaders(): HttpHeaders {
 		const token = localStorage.getItem('token');
-		if (token) {
-			headers = headers.set('Authorization', `Bearer ${token}`);
-		}
-
-		return headers;
+		return new HttpHeaders({ Authorization: `Bearer ${token}` });
 	}
 
 	getHabits(): Observable<Habit[]> {
-		return this.http.get<Habit[]>(`${this.apiUrl}/`, {
-			headers: this.getAuthHeaders()
-		});
+		return this.http.get<Habit[]>(this.apiUrl, { headers: this.authHeaders() });
 	}
 
-	addHabit(habitData: Partial<Habit>): Observable<Habit> {
-		return this.http.post<Habit>(`${this.apiUrl}/`, habitData, {
-			headers: this.getAuthHeaders()
-		});
+	createHabit(habit: { name: string; frequency: Frequency }): Observable<Habit> {
+		const payload = { name: habit.name.trim(), frequency: habit.frequency };
+		return this.http.post<Habit>(this.apiUrl, payload, { headers: this.authHeaders() });
 	}
 
-	deleteHabit(habitId: number): Observable<unknown> {
-		return this.http.delete(`${this.apiUrl}/${habitId}`, {
-			headers: this.getAuthHeaders()
-		});
+	deleteHabit(habitId: number): Observable<void> {
+		return this.http.delete<void>(`${this.apiUrl}/${habitId}`, { headers: this.authHeaders() });
 	}
 
-	markComplete(habitId: number, completionData: HabitCompletionIn): Observable<unknown> {
-		return this.http.post(`${this.apiUrl}/${habitId}/complete`, completionData, {
-			headers: this.getAuthHeaders()
-		});
+	completeHabit(habitId: number, isoDate: string): Observable<Completion> {
+		return this.http.post<Completion>(`${this.apiUrl}/${habitId}/complete`, { date: isoDate }, { headers: this.authHeaders() });
 	}
 
-	getStreaks(): Observable<HabitStreak[]> {
-		return this.http.get<HabitStreak[]>(`${this.apiUrl}/streaks`, {
-			headers: this.getAuthHeaders()
-		});
+	getCompletions(habitId: number): Observable<string[]> {
+		return this.http.get<string[]>(`${this.apiUrl}/${habitId}/completions`, { headers: this.authHeaders() });
 	}
 }

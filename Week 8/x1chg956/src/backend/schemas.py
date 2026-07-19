@@ -1,5 +1,6 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
 from datetime import date
+from typing import Literal
 
 # Schemas
 
@@ -11,31 +12,39 @@ class AuthRequest(BaseModel):
 class AuthResponse(BaseModel):
     token: str
     user: dict
-    
+
 # Schemas for habits and completions
 
-
 class HabitCreate(BaseModel):
-    name: str
-    frequency: str
+    name: str = Field(min_length=1)
+    frequency: Literal["Daily", "Weekly"]
+
+    @field_validator("name")
+    @classmethod
+    def strip_name(cls, value: str) -> str:
+        stripped = value.strip()
+        if not stripped:
+            raise ValueError("name must not be blank")
+        return stripped
 
 
-class HabitOut(BaseModel):
-    id: int
-    userId: int
-    name: str
-    frequency: str
-
-
-class HabitCompletionIn(BaseModel):
-    completion_date: date
-
-
-class HabitStreakOut(BaseModel):
+class HabitResponse(BaseModel):
     habitId: int
     name: str
     frequency: str
-    current_streak: int
-    longest_streak: int
-    last_completed_date: date | None
+    completed: bool
+
+    model_config = {"from_attributes": True}
+
+
+class CompletionRequest(BaseModel):
+    date: date
+
+
+class CompletionResponse(BaseModel):
+    id: int
+    habitId: int
+    period_start: date
+
+    model_config = {"from_attributes": True}
 

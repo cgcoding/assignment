@@ -1,103 +1,98 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
-import { Habit, HabitFrequency, HabitCompletionIn } from './habit.model';
+import { Router, RouterLink } from '@angular/router';
 import { HabitService } from './habit.service';
+import { Habit, Frequency } from './habit.model';
 
 @Component({
 	selector: 'app-habit',
 	standalone: true,
-	imports: [CommonModule, FormsModule],
+	imports: [CommonModule, FormsModule, RouterLink],
 	templateUrl: './habit.html',
 	styleUrl: './habit.css'
 })
 export class HabitComponent implements OnInit {
 	habits: Habit[] = [];
-	newHabit: { name: string; frequency: HabitFrequency } = {
-		name: '',
-		frequency: 'daily'
-	};
+	newHabit: { name: string; frequency: Frequency } = { name: '', frequency: 'Daily' };
 	errorMessage: string | null = null;
-	successMessage: string | null = null;
 
-	constructor(private habitService: HabitService) { }
+	constructor(private habitService: HabitService, private router: Router, private cdr: ChangeDetectorRef) { }
 
 	ngOnInit(): void {
-		this.getHabits();
-	}
-
-	getHabits(): void {
-		this.errorMessage = null;
 		this.habitService.getHabits().subscribe({
-			next: (response) => {
-				this.habits = response;
+			next: (habits) => {
+				this.habits = habits;
+				this.cdr.markForCheck();
 			},
 			error: (err) => {
-				this.errorMessage = 'Failed to load habits. Please login again.';
+				this.errorMessage = 'Failed to load habits.';
 				console.error(err);
+				this.cdr.markForCheck();
 			}
 		});
 	}
 
-	addHabit(): void {
-		this.errorMessage = null;
-		this.successMessage = null;
-
-		const habitName = this.newHabit.name.trim();
-		if (!habitName) {
-			this.errorMessage = 'Habit name is required.';
-			return;
-		}
-
-		this.habitService.addHabit({
-			name: habitName,
-			frequency: this.newHabit.frequency
-		}).subscribe({
-			next: (createdHabit) => {
-				this.habits = [createdHabit, ...this.habits];
-				this.newHabit = { name: '', frequency: 'daily' };
-				this.successMessage = 'Habit added successfully.';
+	onSubmit(): void {
+		if (!this.newHabit.name.trim()) return;
+		this.habitService.createHabit(this.newHabit).subscribe({
+			next: (habit) => {
+				this.habits.push(habit);
+				this.newHabit = { name: '', frequency: 'Daily' };
+				this.cdr.markForCheck();
 			},
 			error: (err) => {
-				this.errorMessage = 'Failed to add habit.';
+				this.errorMessage = 'Failed to create habit.';
 				console.error(err);
+				this.cdr.markForCheck();
 			}
 		});
 	}
 
-	deleteHabit(habitId: number): void {
-		this.errorMessage = null;
-		this.successMessage = null;
-
-		this.habitService.deleteHabit(habitId).subscribe({
+	completeHabit(habit: Habit): void {
+		this.habitService.completeHabit(habit.habitId, this.todayIso()).subscribe({
 			next: () => {
-				this.habits = this.habits.filter((habit) => habit.id !== habitId);
-				this.successMessage = 'Habit deleted.';
+				this.errorMessage = null;
+				habit.completed = true;
+				this.cdr.markForCheck();
+			},
+			error: (err) => {
+				this.errorMessage = err.status === 409
+					? `"${habit.name}" is already completed for this period.`
+					: 'Failed to complete habit.';
+				if (err.status === 409) {
+					habit.completed = true;
+				}
+				console.error(err);
+				this.cdr.markForCheck();
+			}
+		});
+	}
+
+	deleteHabit(habit: Habit): void {
+		this.habitService.deleteHabit(habit.habitId).subscribe({
+			next: () => {
+				this.habits = this.habits.filter(h => h.habitId !== habit.habitId);
+				this.cdr.markForCheck();
 			},
 			error: (err) => {
 				this.errorMessage = 'Failed to delete habit.';
 				console.error(err);
+				this.cdr.markForCheck();
 			}
 		});
 	}
 
-	markComplete(habitId: number): void {
-		this.errorMessage = null;
-		this.successMessage = null;
+	logout(): void {
+		localStorage.removeItem('token');
+		this.router.navigate(['/auth']);
+	}
 
-		const today = new Date().toISOString().split('T')[0];
-		const payload: HabitCompletionIn = { completion_date: today };
-
-		this.habitService.markComplete(habitId, payload).subscribe({
-			next: () => {
-				this.successMessage = 'Habit marked complete for today.';
-			},
-			error: (err) => {
-				const backendMessage = err?.error?.detail;
-				this.errorMessage = backendMessage || 'Failed to mark habit complete.';
-				console.error(err);
-			}
-		});
+	private todayIso(): string {
+		const d = new Date();
+		const yyyy = d.getFullYear();
+		const mm = String(d.getMonth() + 1).padStart(2, '0');
+		const dd = String(d.getDate()).padStart(2, '0');
+		return `${yyyy}-${mm}-${dd}`;
 	}
 }
