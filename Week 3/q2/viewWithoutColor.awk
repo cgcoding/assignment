@@ -2,13 +2,8 @@ BEGIN {
   FS = ","
   OFS = ""
   width = 20
-  cols = 6
   line = ""
   semester_filter_norm = toupper(trim(semester_filter))
-
-  for (i = 1; i <= width * cols; i++) {
-    line = line "-"
-  }
 }
 
 function trim(s) {
@@ -17,6 +12,13 @@ function trim(s) {
 }
 
 NR == 1 {
+  # Separator width must be 20 * number of displayed fields.
+  cols = NF - 1  # Drop the Name column from display.
+  line = ""
+  for (i = 1; i <= width * cols; i++) {
+    line = line "-"
+  }
+
   print line
   printf "%20s%20s%20s%20s%20s%20s\n", "Year", "Semester", "Code", "Credits", "Tag", "letterGrade"
   print line

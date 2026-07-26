@@ -53,10 +53,18 @@ function trim(s) {
   return s
 }
 
+function canon(s) {
+  return toupper(trim(s))
+}
+
 {
   plain = strip_ansi($0)
-  if (trim(substr(plain, 1, 20)) == yr && trim(substr(plain, 21, 20)) == sem) {
-    printf "%s\t%s\n", substr(plain, 41, 20), $0
+  year_val = trim(substr(plain, 1, 20))
+  sem_val = trim(substr(plain, 21, 20))
+  code_val = trim(substr(plain, 41, 20))
+
+  if (canon(year_val) == canon(yr) && canon(sem_val) == canon(sem)) {
+    printf "%s\t%s\n", code_val, $0
   }
 }
 ' | LC_ALL=C sort -t$'\t' -k1,1 | cut -f2-

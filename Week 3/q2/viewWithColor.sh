@@ -65,6 +65,12 @@ function canon(s) {
   return s
 }
 
+function canon_tag(s) {
+  s = toupper(trim(s))
+  gsub(/[[:space:]-]+/, "_", s)
+  return s
+}
+
 function font_code(name, n) {
   n = canon(name)
   if (n == "RED" || n == "RED_FONT") return RED_FONT
@@ -110,7 +116,7 @@ NR == FNR {
 
   if (tag_col == 0) next
 
-  tag = trim($tag_col)
+  tag = canon_tag($tag_col)
   fg = (fg_col > 0) ? trim($(fg_col)) : ""
   bg = (bg_col > 0) ? trim($(bg_col)) : ""
 
@@ -128,7 +134,7 @@ NR == FNR {
     next
   }
 
-  tag = trim(substr($0, 81, 20))
+  tag = canon_tag(substr($0, 81, 20))
   fg = font_code(tag_fg[tag])
   bg = bg_code(tag_bg[tag])
 
